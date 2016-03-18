@@ -58031,7 +58031,11 @@
 	function getBeatsByTime() {
 	  var beats = {};
 	  audioData.beats.forEach(function (b) {
-	    beats[b.start.toFixed(1)] = { duration: b.duration, end: b.start + b.duration, confidence: b.confidence };
+	    beats[b.start.toFixed(1)] = {
+	      start: b.start,
+	      duration: b.duration,
+	      end: b.start + b.duration,
+	      confidence: b.confidence };
 	  });
 	  return beats;
 	}
@@ -58277,7 +58281,7 @@
 	  for (var i = 0; i < frequencyData.length; i++) {
 	    var particle = geometry.vertices[i];
 	    //particle.x -= 2
-	    particle.y = 100 + frequencyData[i];
+	    particle.y = 100 + frequencyData[i] * -3;
 
 	    // if(particle.x < -window.innerWidth) {
 	    //   particle.x = window.innerWidth*2
@@ -58570,7 +58574,7 @@
 
 	      if (launched) {
 	        headerMotionStyle.scale = (0, _reactMotion.spring)(1.25, springParams);
-	        headerMotionStyle.opacity = (0, _reactMotion.spring)(.75, springParams);
+	        headerMotionStyle.opacity = (0, _reactMotion.spring)(.125, springParams);
 	        headerMotionStyle.y = (0, _reactMotion.spring)(180, springParams);
 
 	        buttonMotionStyle.scale = (0, _reactMotion.spring)(1, springParams);
@@ -58596,6 +58600,34 @@
 	            onNavigate: this.navigate.bind(this) })
 	        ),
 	        _react2.default.createElement('div', { id: 'visualization' }),
+	        _react2.default.createElement(
+	          _reactMotionUiPack2.default,
+	          {
+	            runOnMount: true,
+	            component: false // don't use a wrapping component
+	            , enter: {
+	              opacity: 1,
+	              translateY: (0, _reactMotion.spring)(0)
+	            },
+	            leave: {
+	              opacity: 0,
+	              translateY: 0
+	            } },
+	          this.state.launched && _react2.default.createElement(
+	            'div',
+	            { key: 'nowplaying', className: 'gt-screen__nowplaying' },
+	            _react2.default.createElement(
+	              'span',
+	              { className: 'gt-screen__nowplaying-label gt-text--subhead' },
+	              'now playing'
+	            ),
+	            _react2.default.createElement(
+	              'h1',
+	              { className: 'gt-screen__nowplaying-title' },
+	              'Like a Glass Angel'
+	            )
+	          )
+	        ),
 	        _react2.default.createElement(
 	          'div',
 	          { className: 'gt-screen__toolbar' },
@@ -58840,6 +58872,8 @@
 	var objects = [];
 	var bufferLength = analyser.frequencyBinCount;
 	var frequencyData = new Uint8Array(bufferLength);
+	var currentBeat;
+	var lastBeat = {};
 
 	var beatsByTime;
 	var segmentsByTime;
@@ -58897,33 +58931,33 @@
 	  // CAMERA
 	  camera = new _three2.default.PerspectiveCamera(200, screenX / screenY, 1, 20000);
 
-	  camera.position.z = 1750;
-	  camera.position.y = 40;
+	  camera.position.z = 1850;
+	  camera.position.y = 10;
 
 	  camera.lookAt(scene.position);
 
 	  //camera.rotation.x = -1
 
 	  // LIGHTS
-	  scene.add(new _three2.default.AmbientLight(0xffffff, 1.0));
+	  scene.add(new _three2.default.AmbientLight(0xffffff, 0.1));
 
-	  light = new _three2.default.DirectionalLight(0x3FBAC2, 1.0);
+	  light = new _three2.default.DirectionalLight(0x3FBAC2, 0.1);
 	  light.castShadow = true;
 	  light.position.set(-80, 400, 4000);
 	  scene.add(light);
 
-	  var light1 = new _three2.default.DirectionalLight(0xF64662, 1.0);
+	  var light1 = new _three2.default.DirectionalLight(0xF64662, 0.1);
 	  light1.position.set(80, 120, 4000);
 	  scene.add(light1);
 
-	  var light2 = new _three2.default.DirectionalLight(0x92E0A9, 1.0);
+	  var light2 = new _three2.default.DirectionalLight(0x92E0A9, 0.1);
 	  light2.position.set(80, -120, 4000);
 	  scene.add(light2);
 	  //scene.add(new THREE.CameraHelper( light.shadow.camera ))
 
 	  // INTRO TEXT
 	  textObject = new _three2.default.Object3D();
-	  scene.add(textObject);
+	  //scene.add(textObject)
 
 	  var text1 = (0, _Text.TextMesh)('without');
 	  var text2 = (0, _Text.TextMesh)('a glass palace');
@@ -59011,7 +59045,7 @@
 	  dirtPass = new WAGNER.DirtPass();
 	  blendPass = new WAGNER.BlendPass();
 	  bloomPass = new WAGNER.MultiPassBloomPass();
-	  bloomPass.params.blurAmount = 3;
+	  bloomPass.params.blurAmount = 1;
 	  FXAAPass = new WAGNER.FXAAPass();
 	  vignettePass = new WAGNER.Vignette2Pass();
 	  vignettePass.params.boost = 2;
@@ -59037,14 +59071,46 @@
 	  playing = true;
 	}
 
-	function addBar(bar) {
-	  console.log('bar', bar.duration);
-	  var radius = 320;
-	  var geometry = new _three2.default.SphereGeometry(radius, 4, 4); //(radius, 32, 32);
+	var beats = [];
+
+	function addBeat(beat, num) {
+	  var radius = 120;
+	  var geometry = new _three2.default.SphereGeometry(radius, 1); //(radius, 32, 32);
 	  var material = new _three2.default.MeshPhongMaterial({
 	    color: Math.random() * 0xffffff,
 	    transparent: true,
 	    specular: Math.random() * 0xffffff,
+	    wireframe: true,
+	    opacity: 1.0
+	  });
+	  var _mesh = new _three2.default.Mesh(geometry, material);
+	  _mesh.scale.set(1, 1, 1);
+	  _mesh.position.set(Math.random() * 1.0 - 0.5, Math.random() * 1.0 - 0.5, Math.random() - 0.1);
+	  _mesh.position.multiplyScalar(20000);
+	  scene.add(_mesh);
+
+	  new _tween2.default.Tween({ y: _mesh.position.y, scale: 1 }).to({ y: screenY * 5, scale: beat.confidence * 10 }, beat.duration * 1000).easing(_tween2.default.Easing.Quadratic.Out).onUpdate(function (t) {
+	    _mesh.scale.set(this.scale, this.scale, this.scale);
+	    //_mesh.position.setY(this.y)
+	    _mesh.rotation.y += 0.1;
+	    //_mesh.material.opacity=1-t
+	  }).onComplete(function () {
+	    //scene.remove(_mesh)
+	    new _tween2.default.Tween(_mesh.scale).delay(num * 10).to({ x: 1, y: 1, z: 1 }, beat.duration * 1000).onUpdate(function (t) {
+	      _mesh.material.opacity = 1 - t;
+	      _mesh.rotation.y -= 0.1;
+	    }).start();
+	  }).start();
+	}
+
+	function addBar(bar) {
+	  var radius = 320;
+	  var geometry = new _three2.default.SphereGeometry(radius, 4, 4); //(radius, 32, 32);
+	  var material = new _three2.default.MeshPhongMaterial({
+	    color: Math.random() * 0x121212,
+	    transparent: true,
+	    specular: Math.random() * 0xffffff,
+	    //shading: THREE.FlatShading
 	    wireframe: true
 	  });
 	  var _mesh = new _three2.default.Mesh(geometry, material);
@@ -59078,7 +59144,7 @@
 	      color: Math.random() * 0xffffff,
 	      transparent: true,
 	      specular: Math.random() * 0xffffff,
-	      wireframe: true
+	      wireframe: loudnessMax >= 0.95 ? false : true
 	    });
 
 	    var _mesh = new _three2.default.Mesh(geometry, material);
@@ -59106,7 +59172,7 @@
 	  var tween = new _tween2.default.Tween({ scale: 0 }).delay(delay).to({ scale: scale }, duration * 1000).easing(_tween2.default.Easing.Elastic.Out).onUpdate(function (t) {
 	    m.scale.set(this.scale, this.scale, this.scale);
 	  }).onComplete(function () {
-	    tweenSegmentOut(m, 1900, loudness * 1000, true);
+	    tweenSegmentOut(m, 2000, loudness * 1000, true);
 	  }).start();
 
 	  // var tween = new TWEEN
@@ -59219,7 +59285,7 @@
 	//   console.log('z', posZ)
 	// })
 
-	//audio.currentTime = 60
+	audio.currentTime = 60;
 	function getDistance(time) {
 	  var t = time / 1000;
 	  var distX = 1 * t + velocityX * Math.pow(t, 2) / 2;
@@ -59228,6 +59294,7 @@
 	  velocityY = 0;
 	  return { x: distX / 10, y: distY / 10 };
 	}
+	var beatsCount = 0;
 
 	function animate(time) {
 	  barDuration = 1 / (_audioData.audioData.info.bpm / 60);
@@ -59240,11 +59307,27 @@
 	  currentScene = scenesByTime[audio.currentTime.toFixed(0)];
 	  currentSegment = segmentsByTime[audio.currentTime.toFixed(1)];
 	  currentBar = barsByTime[audio.currentTime.toFixed(1)];
+	  currentBeat = beatsByTime[audio.currentTime.toFixed(1)];
 
 	  if (currentBar && currentBar.start != lastBar.start) {
-	    console.log('currentBar', currentBar);
 	    addBar(currentBar);
 	    lastBar = currentBar;
+	  }
+
+	  if (currentBeat && currentBeat.start != lastBeat.start) {
+
+	    if (currentBeat) {
+	      console.log('beat', currentBeat.confidence);
+
+	      addBeat(currentBeat, beatsCount);
+
+	      if (beatsCount == 4) {
+	        beatsCount = 0;
+	      }
+	      beatsCount += 1;
+	    }
+
+	    lastBeat = currentBeat;
 	  }
 
 	  if (currentSegment) {
@@ -63557,7 +63640,7 @@
 
 
 	// module
-	exports.push([module.id, "\n.gt-screen--home {\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: flex-end;\n  /*background: rgba(255, 255, 255, .12);*/\n  position: relative;\n  z-index: 1;\n  position: absolute;\n}\n\n#visualization {\n  background: #000;\n}\n\n#visualization canvas {\n  position: fixed;\n  /*top: 100px;*/\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 1;\n}\n\n.gt-screen__icosahedron {\n  position: fixed;\n  top: 0;\n  right: 0;\n  z-index: 9999;\n}\n\n@media screen and (min-width: 768px) {\n  .gt-screen__icosahedron {\n    top: 2em;\n    right: 2em;\n  }\n}\n\n.gt-screen__title {\n  margin-top: auto;\n  text-align: center;\n}\n\n.gt-title {\n  font-size: 1.25em;\n  text-transform: uppercase;\n  font-weight: 600;\n  margin: 0;\n  letter-spacing: 0em;\n  margin-top: auto;\n}\n\n.gt-title span span {\n  /*border-bottom: 2px solid #fff;*/\n  display: inline-block;\n  min-width: 20px;\n  text-align: center;\n  font-size: 1em;\n}\n\n.gt-screen__action {\n  margin-top: 2em;\n  margin-bottom: 10em;\n  text-align: center;\n}\n\n.gt-screen__footer {\n  \n}\n\n.gt-button:focus {\n  outline: none;\n}\n\n.gt-button--launch {\n  color: #fff;\n  text-decoration: none;\n  background: transparent;\n  border-top: 1px solid rgba(255, 255, 255, 0);\n  border-left: 1px solid rgba(255, 255, 255, 0);\n  border-right: 1px solid rgba(255, 255, 255, 0);\n  border-bottom: 1px solid rgba(255, 255, 255, 0);\n  display: inline-block;\n  padding: 1.5em 2.5em;\n  border-radius: 0;\n  text-transform: uppercase;\n  font-size: .75em;\n  /*letter-spacing: .15em;*/\n  min-width: 100px;\n  text-align: center;\n  /*transition: all .8s ease-out;*/\n}\n\n/*.gt-button--launch:hover {\n  border-top: 1px solid rgba(255, 255, 255, .25);\n  border-left: 1px solid rgba(255, 255, 255, .25);\n  border-right: 1px solid rgba(255, 255, 255, .25);\n  border-bottom: 1px solid rgba(255, 255, 255, .25);\n  border-radius: 25px;\n  letter-spacing: .275em;\n}*/\n\n.gt-screen--project {\n  min-height: 100vh;\n  position: relative;\n  z-index: 10;\n  background: rgba(255, 255, 255, .12);\n  display: flex;\n}\n\n.gt-screen__left,\n.gt-screen__right {\n  flex: 2;\n}\n\n.gt-screen__right {\n  flex: 3;\n}\n\n.gt-screen__left-title {\n  padding: 2em 1em;\n  font-weight: 100;\n  font-size: 4em;\n}\n\n.gt-screen__right {\n  /*background: #fff;*/\n}\n\nh1,\nh2,\nh3 {\n  margin: 0;\n}\n\nh2 {\n  font-weight: 100;\n  text-transform: uppercase;\n  font-size: .75em;\n}\n\nh2 span span {\n  width: 12px;\n  display: inline-block;\n  text-align: center;\n  font-weight: 800;\n  color: #777;\n}\n\n.gt-text--secondary {\n  font-size: .9em;\n}\n\n.gt-text--small {\n  font-size: .85em;\n  opacity: .75;\n  font-weight: 100;\n}\n\n.gt-text--body {\n  padding: 4em 6em 4em;\n  line-height: 1.5;\n  font-size: 1.5em;\n  font-weight: 100;\n  color: rgba(255, 255, 255, .9);\n  -webkit-font-smoothing: antialiased;\n}\n\n.gt-screen__toolbar {\n  position: fixed;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  padding: 2em;\n  text-align: right;\n}", ""]);
+	exports.push([module.id, "\n.gt-screen--home {\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: flex-end;\n  /*background: rgba(255, 255, 255, .12);*/\n  position: relative;\n  z-index: 1;\n  position: absolute;\n}\n\n#visualization {\n  background: #000;\n}\n\n#visualization canvas {\n  position: fixed;\n  /*top: 100px;*/\n  left: 0;\n  width: 100%;\n  height: 100%;\n  z-index: 1;\n}\n\n.gt-screen__icosahedron {\n  position: fixed;\n  top: 0;\n  right: 0;\n  z-index: 9999;\n}\n\n@media screen and (min-width: 768px) {\n  .gt-screen__icosahedron {\n    top: 2em;\n    right: 2em;\n  }\n}\n\n.gt-screen__title {\n  margin-top: auto;\n  text-align: center;\n}\n\n.gt-title {\n  font-size: 1.25em;\n  text-transform: uppercase;\n  font-weight: 600;\n  margin: 0;\n  letter-spacing: 0em;\n  margin-top: auto;\n}\n\n.gt-title span span {\n  /*border-bottom: 2px solid #fff;*/\n  display: inline-block;\n  min-width: 20px;\n  text-align: center;\n  font-size: 1em;\n}\n\n.gt-screen__action {\n  margin-top: 2em;\n  margin-bottom: 10em;\n  text-align: center;\n}\n\n.gt-screen__footer {\n  \n}\n\n.gt-button:focus {\n  outline: none;\n}\n\n.gt-button--launch {\n  color: #fff;\n  text-decoration: none;\n  background: transparent;\n  border-top: 1px solid rgba(255, 255, 255, 0);\n  border-left: 1px solid rgba(255, 255, 255, 0);\n  border-right: 1px solid rgba(255, 255, 255, 0);\n  border-bottom: 1px solid rgba(255, 255, 255, 0);\n  display: inline-block;\n  padding: 1.5em 2.5em;\n  border-radius: 0;\n  text-transform: uppercase;\n  font-size: .75em;\n  /*letter-spacing: .15em;*/\n  min-width: 100px;\n  text-align: center;\n  /*transition: all .8s ease-out;*/\n}\n\n/*.gt-button--launch:hover {\n  border-top: 1px solid rgba(255, 255, 255, .25);\n  border-left: 1px solid rgba(255, 255, 255, .25);\n  border-right: 1px solid rgba(255, 255, 255, .25);\n  border-bottom: 1px solid rgba(255, 255, 255, .25);\n  border-radius: 25px;\n  letter-spacing: .275em;\n}*/\n\n.gt-screen--project {\n  min-height: 100vh;\n  position: relative;\n  z-index: 10;\n  background: rgba(255, 255, 255, .12);\n  display: flex;\n}\n\n.gt-screen__left,\n.gt-screen__right {\n  flex: 2;\n}\n\n.gt-screen__right {\n  flex: 3;\n}\n\n.gt-screen__left-title {\n  padding: 2em 1em;\n  font-weight: 100;\n  font-size: 4em;\n}\n\n.gt-screen__right {\n  /*background: #fff;*/\n}\n\nh1,\nh2,\nh3 {\n  margin: 0;\n}\n\nh2 {\n  font-weight: 100;\n  text-transform: uppercase;\n  font-size: .75em;\n}\n\nh2 span span {\n  width: 12px;\n  display: inline-block;\n  text-align: center;\n  font-weight: 800;\n  color: #777;\n}\n\n.gt-text--secondary {\n  font-size: .9em;\n}\n\n.gt-text--small {\n  font-size: .85em;\n  opacity: .75;\n  font-weight: 100;\n}\n\n.gt-text--body {\n  padding: 4em 6em 4em;\n  line-height: 1.5;\n  font-size: 1.5em;\n  font-weight: 100;\n  color: rgba(255, 255, 255, .9);\n  -webkit-font-smoothing: antialiased;\n}\n\n.gt-screen__toolbar {\n  position: fixed;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  padding: 2em;\n  text-align: right;\n}\n\n.gt-screen__nowplaying {\n  position: fixed;\n  top: 2em;\n  left: 2em;\n  z-index: 10;\n}\n\n.gt-screen__nowplaying-label {\n  opacity: .5;\n}\n\n.gt-screen__nowplaying-title {\n  line-height: 1;\n  margin: 0;\n  padding: 0;\n  font-weight: 100;\n  font-size: 1.5em;\n}", ""]);
 
 	// exports
 

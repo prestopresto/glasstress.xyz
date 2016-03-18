@@ -64,6 +64,8 @@ var tethraGeometry = new THREE.TetrahedronGeometry(1120, 4);
 const objects = []
 var bufferLength = analyser.frequencyBinCount;
 var frequencyData = new Uint8Array(bufferLength)
+var currentBeat;
+var lastBeat = {};
 
 import { setupData, audioData, getBeatsByTime, getSegmentsByTime, getBarsByTime, getTatumsByTime, getScenesByTime } from '../lib/audio-data'
 import { TextMesh } from '../objects/Text'
@@ -126,26 +128,26 @@ export function init() {
   // CAMERA
   camera = new THREE.PerspectiveCamera( 200, screenX / screenY, 1, 20000)
   
-  camera.position.z = 1750
-  camera.position.y = 40
+  camera.position.z = 1850
+  camera.position.y = 10
 
   camera.lookAt( scene.position );
   
   //camera.rotation.x = -1
 
   // LIGHTS
-  scene.add(new THREE.AmbientLight( 0xffffff, 1.0 ))
+  scene.add(new THREE.AmbientLight( 0xffffff, 0.1 ))
   
-  light = new THREE.DirectionalLight( 0x3FBAC2, 1.0 );
+  light = new THREE.DirectionalLight( 0x3FBAC2, 0.1 );
   light.castShadow = true;
   light.position.set(-80, 400, 4000)
   scene.add(light)
 
-  var light1 = new THREE.DirectionalLight( 0xF64662, 1.0 );
+  var light1 = new THREE.DirectionalLight( 0xF64662, 0.1 );
   light1.position.set(80, 120, 4000)
   scene.add(light1)
 
-  var light2 = new THREE.DirectionalLight( 0x92E0A9, 1.0 );
+  var light2 = new THREE.DirectionalLight( 0x92E0A9, 0.1 );
   light2.position.set(80, -120, 4000)
   scene.add(light2)
   //scene.add(new THREE.CameraHelper( light.shadow.camera ))
@@ -153,7 +155,7 @@ export function init() {
 
   // INTRO TEXT
   textObject = new THREE.Object3D()
-  scene.add(textObject)
+  //scene.add(textObject)
 
   const text1 = TextMesh('without')
   const text2 = TextMesh('a glass palace')
@@ -242,7 +244,7 @@ export function init() {
   dirtPass = new WAGNER.DirtPass();
   blendPass = new WAGNER.BlendPass();
   bloomPass = new WAGNER.MultiPassBloomPass();
-  bloomPass.params.blurAmount = 3;
+  bloomPass.params.blurAmount = 1;
   FXAAPass = new WAGNER.FXAAPass();
   vignettePass = new WAGNER.Vignette2Pass();
   vignettePass.params.boost = 2;
@@ -269,14 +271,57 @@ export function playScene() {
   playing = true
 }
 
-function addBar(bar) {
-  console.log('bar', bar.duration)
-  const radius = 320
-  const geometry = new THREE.SphereGeometry( radius, 4, 4 )//(radius, 32, 32);
+let beats=[]
+
+function addBeat(beat, num) {
+  const radius = 120
+  const geometry = new THREE.SphereGeometry( radius, 1)//(radius, 32, 32);
   const material = new THREE.MeshPhongMaterial({
     color: Math.random()*0xffffff, 
     transparent: true,
     specular: Math.random() * 0xffffff,
+    wireframe: true,
+    opacity: 1.0
+  })
+  const _mesh = new THREE.Mesh(geometry, material)
+  _mesh.scale.set(1,1,1)
+  _mesh.position.set(Math.random()*1.0-0.5, Math.random()*1.0-0.5, Math.random()-0.1)
+  _mesh.position.multiplyScalar(20000)
+  scene.add(_mesh)
+
+  new TWEEN
+    .Tween({y: _mesh.position.y, scale: 1})
+    .to({y: screenY*5, scale: beat.confidence*10}, beat.duration*1000)
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate(function(t) {
+      _mesh.scale.set(this.scale, this.scale, this.scale)
+      //_mesh.position.setY(this.y)
+      _mesh.rotation.y += 0.1
+      //_mesh.material.opacity=1-t
+    })
+    .onComplete(function() {
+      //scene.remove(_mesh)
+      new TWEEN
+        .Tween(_mesh.scale)
+        .delay(num*10)
+        .to({x: 1, y: 1, z: 1}, beat.duration*1000)
+        .onUpdate(function(t) {
+          _mesh.material.opacity=1-t
+          _mesh.rotation.y -= 0.1
+        })
+        .start()
+    })
+    .start()
+}
+
+function addBar(bar) {
+  const radius = 320
+  const geometry = new THREE.SphereGeometry( radius, 4, 4 )//(radius, 32, 32);
+  const material = new THREE.MeshPhongMaterial({
+    color: Math.random()*0x121212, 
+    transparent: true,
+    specular: Math.random() * 0xffffff,
+    //shading: THREE.FlatShading
     wireframe: true
   })
   const _mesh = new THREE.Mesh(geometry, material)
@@ -314,7 +359,7 @@ function addSegment(segment, radius=10, multiplyScalar=10) {
       color: Math.random()*0xffffff, 
       transparent: true,
       specular: Math.random() * 0xffffff,
-      wireframe: true
+      wireframe: loudnessMax >= 0.95 ? false : true
     })
 
     const _mesh = new THREE.Mesh(geometry, material)
@@ -349,7 +394,7 @@ function tweenSegment(m, loudness, duration, delay=1, remove=true) {
       m.scale.set(this.scale, this.scale, this.scale)
     })
     .onComplete(function() {
-      tweenSegmentOut(m, 1900, loudness*1000, true)
+      tweenSegmentOut(m, 2000, loudness*1000, true)
     })
     .start()
     
@@ -469,7 +514,7 @@ var distanceY = 0, velocityY = 0
 //   console.log('z', posZ)
 // })
 
-//audio.currentTime = 60
+audio.currentTime = 60
 function getDistance(time) {
   var t = time/1000
   var distX = 1*(t)+(velocityX*Math.pow(t, 2))/2
@@ -478,6 +523,7 @@ function getDistance(time) {
   velocityY = 0
   return {x: distX/10, y: distY/10 }
 }
+var beatsCount = 0
 
 export function animate(time) {
   barDuration = 1 / (audioData.info.bpm / 60)
@@ -490,12 +536,30 @@ export function animate(time) {
   currentScene = scenesByTime[audio.currentTime.toFixed(0)]
   currentSegment = segmentsByTime[audio.currentTime.toFixed(1)]
   currentBar = barsByTime[audio.currentTime.toFixed(1)]
-
+  currentBeat = beatsByTime[audio.currentTime.toFixed(1)]
+  
   if(currentBar && currentBar.start != lastBar.start) {
-    console.log('currentBar', currentBar)
     addBar(currentBar)
     lastBar = currentBar
   }
+
+  if(currentBeat && currentBeat.start != lastBeat.start) {
+    
+    if(currentBeat) {
+      console.log('beat', currentBeat.confidence)
+      
+      addBeat(currentBeat, beatsCount)
+
+      if(beatsCount == 4) {
+        beatsCount = 0
+      }
+      beatsCount+=1
+    }
+
+    lastBeat = currentBeat
+    
+  }
+
 
   if(currentSegment) {
     segmentLoudness = ((-100 - currentSegment.loudnessMax) * -1) / 100

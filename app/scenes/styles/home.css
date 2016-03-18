@@ -179,3 +179,22 @@ h2 span span {
   padding: 2em;
   text-align: right;
 }
+
+.gt-screen__nowplaying {
+  position: fixed;
+  top: 2em;
+  left: 2em;
+  z-index: 10;
+}
+
+.gt-screen__nowplaying-label {
+  opacity: .5;
+}
+
+.gt-screen__nowplaying-title {
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  font-weight: 100;
+  font-size: 1.5em;
+}

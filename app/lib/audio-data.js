@@ -21,7 +21,11 @@ export { audioData }
 export function getBeatsByTime() {
   const beats = {}
   audioData.beats.forEach(b => {
-    beats[b.start.toFixed(1)] = { duration: b.duration, end: b.start + b.duration, confidence: b.confidence}
+    beats[b.start.toFixed(1)] = { 
+      start: b.start,
+      duration: b.duration, 
+      end: b.start + b.duration, 
+      confidence: b.confidence}
   })
   return beats
 }

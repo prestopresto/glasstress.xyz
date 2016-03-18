@@ -146,7 +146,7 @@ export default class Scene extends Component {
 
     if(launched) {
       headerMotionStyle.scale = spring(1.25, springParams)
-      headerMotionStyle.opacity =spring(.75, springParams)
+      headerMotionStyle.opacity =spring(.125, springParams)
       headerMotionStyle.y = spring(180, springParams)
 
       buttonMotionStyle.scale = spring(1, springParams)
@@ -163,13 +163,33 @@ export default class Scene extends Component {
 
     return <div>
 
+      {/* NAVIGATION */}
       <div className="gt-screen__icosahedron">
         <Navigation 
           onToggle={this.toggleNavigation.bind(this)}
           onNavigate={this.navigate.bind(this)} />
       </div>
 
+      {/* VISUALIZATION PLACEHOLDER */}
       <div id="visualization" />
+
+      {/* NOW PLAYING */}
+      <Transition
+        runOnMount={true}
+        component={false} // don't use a wrapping component
+        enter={{
+          opacity: 1,
+          translateY: spring(0)
+        }}
+        leave={{
+          opacity: 0,
+          translateY: 0
+        }}>
+        {this.state.launched && <div key="nowplaying" className="gt-screen__nowplaying">
+          <span className="gt-screen__nowplaying-label gt-text--subhead">now playing</span>
+          <h1 className="gt-screen__nowplaying-title">Like a Glass Angel</h1> 
+        </div>}
+      </Transition>
 
       <div className="gt-screen__toolbar">
         toolbar

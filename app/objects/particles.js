@@ -57,7 +57,7 @@ export function update(frequencyData) {
   for(var i=0; i<frequencyData.length;i++) {
     var particle = geometry.vertices[i];
     //particle.x -= 2
-    particle.y = 100 + frequencyData[i]
+    particle.y = 100 + frequencyData[i]*-3
 
     // if(particle.x < -window.innerWidth) {
     //   particle.x = window.innerWidth*2
