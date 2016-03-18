@@ -39,6 +39,7 @@ export default class MotionButton extends Component {
           <button 
             {...this.props}
             style={{
+              // backgroundColor: '#fff',
               transform: `scale(${values.scale})`,
               border: `1px solid rgba(255, 255, 255, ${values.opacity})`,
               borderRadius: values.borderRadius

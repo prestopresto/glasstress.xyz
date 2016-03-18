@@ -234,7 +234,7 @@ export default class Scene extends Component {
                     onMouseOut={this.mouseOut}
                     onClick={this.launch.bind(this)}
                     className="gt-button gt-button--launch"
-                    label="launch visualization*" /> 
+                    label="play*" /> 
                 </div>}
             </Motion>}
 

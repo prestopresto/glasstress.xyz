@@ -6,6 +6,7 @@ import * as particles from '../objects/particles'
 import fft from '../lib/fft'
 
 window.THREE = THREE
+
 // threejs effects & plugins
 require('../vendor') 
 
@@ -19,7 +20,8 @@ var chromaticAbberationPass, FXAAPass, bloomPass, invertPass, boxBlurPass, fullB
 
 var screenX = window.innerWidth
 var screenY = window.innerHeight
-
+var windowHalfX = screenX/2
+var windowHalfY = screenY/2
 var scene;
 var camera;
 var renderer;
@@ -45,7 +47,7 @@ var spotLight;
 var light;
 var object3d;
 var lastSegment = { start:0 };
-var { audio } = fft()
+var { audio, analyser } = fft()
 var cameraZ = 0
 var sunlight;
 var camControls;
@@ -53,7 +55,6 @@ var sky;
 var terrainMesh;
 var sphereMesh;
 var sphereMaterial;
-var loudnessMax;
 var center;
 var dirtPass;
 var blendPass;
@@ -61,6 +62,8 @@ var playing = false
 var textObject;
 var tethraGeometry = new THREE.TetrahedronGeometry(1120, 4);
 const objects = []
+var bufferLength = analyser.frequencyBinCount;
+var frequencyData = new Uint8Array(bufferLength)
 
 import { setupData, audioData, getBeatsByTime, getSegmentsByTime, getBarsByTime, getTatumsByTime, getScenesByTime } from '../lib/audio-data'
 import { TextMesh } from '../objects/Text'
@@ -73,6 +76,7 @@ var scenesByTime;
 
 export function setupAudioData(trackData) {
   setupData(trackData)
+  console.log('trackData', trackData)
   beatsByTime = getBeatsByTime()
   segmentsByTime = getSegmentsByTime()
   barsByTime = getBarsByTime()
@@ -80,7 +84,14 @@ export function setupAudioData(trackData) {
   scenesByTime = getScenesByTime()
 }
 
+
+
 // UTILS
+
+/* convert loudness scale from [-100,0] to [0,1] */
+function getLoudness(loudness) {
+  return ((-100 - loudness) * -1) / 100
+}
 
 function deg2rad() {
 
@@ -205,7 +216,7 @@ export function init() {
 
   //sphereMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [material, mat])
   sphereMesh = new THREE.Mesh(geometry, material);
-  //sphereMesh.position.z = -100
+  sphereMesh.position.z = 1000
   
   // RENDERER
   renderer = new THREE.WebGLRenderer({
@@ -237,11 +248,16 @@ export function init() {
   vignettePass.params.boost = 2;
   vignettePass.params.reduction = 3;
   noisePass = new WAGNER.NoisePass();
-  noisePass.params.amount = .045;
+  noisePass.params.amount = .015;
   chromaticAbberationPass = new WAGNER.ChromaticAberrationPass();
   chromaticAbberationPass.params.amount = 100
   oldVideoPass = new WAGNER.OldVideoPass()
 
+  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+  document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+  //
+  window.addEventListener( 'resize', onWindowResize, false );
 }
 
 
@@ -250,73 +266,71 @@ export function playScene() {
   audio.play()
   scene.add(sphereMesh);
   noisePass.params.speed = 1;
+  playing = true
+}
+
+function addBar(bar) {
+  console.log('bar', bar.duration)
+  const radius = 320
+  const geometry = new THREE.SphereGeometry( radius, 4, 4 )//(radius, 32, 32);
+  const material = new THREE.MeshPhongMaterial({
+    color: Math.random()*0xffffff, 
+    transparent: true,
+    specular: Math.random() * 0xffffff,
+    wireframe: true
+  })
+  const _mesh = new THREE.Mesh(geometry, material)
+  _mesh.scale.set(0,0,0)
+  scene.add(_mesh)
+
+  new TWEEN
+    .Tween({x: _mesh.position.x, scale: 0})
+    .to({x: -screenX*2, scale: 5}, bar.duration*1000)
+    .easing(TWEEN.Easing.Quadratic.Out)
+    .onUpdate(function(t) {
+      _mesh.scale.set(this.scale, this.scale, this.scale)
+      _mesh.rotation.x += 0.1
+      _mesh.material.opacity=1-t
+    })
+    .onComplete(function() {
+      scene.remove(_mesh)
+    })
+    .start()
 }
 
 function addSegment(segment, radius=10, multiplyScalar=10) {
+  
+  const segmentLength = 12
+  
+
   // loudness 0-1
-  loudnessMax = ((-100 - segment.loudnessMax) * -1) / 100
-  var segmentLength = 12
+  const loudnessMin = getLoudness(segment.loudnessStart)
+  const loudnessMax = getLoudness(segment.loudnessMax)
 
   for(var i = 0; i < 3; i++) {
-    const radius = logScale([0.72, 0.97], [1, 64], loudnessMax)
-
-    var uniforms = {
-        scale: { type: "f", value: radius*0.1 },
-        displacement: { type: "f", value: radius*0.1 }
-    };
-    var vertexShader = document.getElementById('vertexShader').text;
-    var fragmentShader = document.getElementById('fragmentShader').text;
-    var material = new THREE.ShaderMaterial(
-        {
-          uniforms : uniforms,
-          vertexShader : vertexShader,
-          fragmentShader : fragmentShader,
-          transparent: true,
-          //opacity: Math.random()
-        });
-    
-    var geometry = new THREE.SphereGeometry( radius, 1, 1 )//(radius, 32, 32);
-    
-    // // material = new THREE.MeshBasicMaterial();
-    //geometry.computeFaceNormals();
-    //geometry.computeVertexNormals();
-
-    //var geometry = new THREE.SphereGeometry( radius, 1, 1) 
-    
-    const materialA = new THREE.MeshPhongMaterial({
-      color: 0xffffff, 
+    const radius = logScale([0.7, 0.99], [1, 96], loudnessMax)
+    const geometry = new THREE.SphereGeometry( radius, 1, 1 )//(radius, 32, 32);
+    const material = new THREE.MeshPhongMaterial({
+      color: Math.random()*0xffffff, 
       transparent: true,
-      //opacity: 1-loudnessMax,
-      //shading: THREE.FlatShading,
       specular: Math.random() * 0xffffff,
       wireframe: true
     })
 
-    const _mesh = new THREE.Mesh(geometry, materialA)
+    const _mesh = new THREE.Mesh(geometry, material)
 
     _mesh.rotation.set(Math.random() * 1, Math.random() * 1, Math.random() * 1)
     _mesh.position.set(
       Math.random() * 2.0 - 1.0,
       Math.random() * 2.0 - 1.0,
       Math.random() * 2.0 - 1.0)
-    // _mesh.position.set(
-    //   sphereMesh.rotation.x,
-    //   sphereMesh.position.y,
-    //   sphereMesh.position.z)
     _mesh.scale.set(1,1,0)
     _mesh.position.multiplyScalar(Math.random() * 500)
     _mesh.castShadow = true
     _mesh.receiveShadow = false
   
     object3d.add(_mesh)
-
-    // sphereMesh.geometry.vertices = geometry.vertices
-    // sphereMesh.geometry.verticesNeedUpdate=true
-    // sphereMesh.geometry.__dirtyVertices=true
-
     tweenSegment(_mesh, loudnessMax, segment.duration, i*(segment.duration/segmentLength)*1000)
-    
-    
   }
 }
 
@@ -335,7 +349,7 @@ function tweenSegment(m, loudness, duration, delay=1, remove=true) {
       m.scale.set(this.scale, this.scale, this.scale)
     })
     .onComplete(function() {
-      tweenSegmentOut(m, 2300, Math.random()*3000, true)
+      tweenSegmentOut(m, 1900, loudness*1000, true)
     })
     .start()
     
@@ -382,23 +396,23 @@ function bump(duration=250, scalarValue=10, remove=false) {
 }
 
 function bumpSegment(loudness, duration) {
-  // var currentObj;
-  // for(var i = 0; i < object3d.children.length; i++) {
-  //   currentObj = object3d.children[i]
-  //   if(currentObj) tweenSegmentOut(currentObj, duration, scalarValue, remove)
-  // }
-
-
   new TWEEN
-    .Tween({ scaleMesh: 1, displacement: sphereUniforms.displacement.value, scale: sphereUniforms.scale.value })
-    .to({ scaleMesh: loudnessMax, displacement: loudness*500, scale: loudness*4}, duration)
+    .Tween({ 
+      scaleMesh: 1, 
+      displacement: sphereUniforms.displacement.value, 
+      scale: sphereUniforms.scale.value 
+    })
+    .to({ 
+      scaleMesh: loudness, 
+      displacement: loudness*500, 
+      scale: loudness*4
+    }, duration)
     .easing(TWEEN.Easing.Quintic.InOut)
     .onUpdate(function() {
       sphereUniforms.displacement.value = this.displacement
       sphereUniforms.scale.value = this.scale
     })
     .start()
-
 }
 
 function bumpScene(currentScene) {
@@ -414,22 +428,6 @@ function bumpScene(currentScene) {
     .start()
 }
 
-function bumpBar(fromScale=0.2, scale=3, duration=2000, returnBack=true) {
-  console.log('bar')
-  new TWEEN
-    .Tween({scale: fromScale})
-    .to({scale} , duration)
-    .easing(TWEEN.Easing.Quintic.InOut)
-    .onUpdate(function() {
-      //sphereMesh.scale.set(this.scale, this.scale, this.scale)
-      //sphereUniforms.scale.value = this.scale
-      //sphereUniforms.displacement.value = this.scale*10
-    })
-    .onComplete(function() {
-      if(returnBack) bumpBar(scale, fromScale, 300, false)
-    })
-    .start()
-}
 
 var barDuration;
 
@@ -471,6 +469,7 @@ var distanceY = 0, velocityY = 0
 //   console.log('z', posZ)
 // })
 
+audio.currentTime = 60
 function getDistance(time) {
   var t = time/1000
   var distX = 1*(t)+(velocityX*Math.pow(t, 2))/2
@@ -482,13 +481,9 @@ function getDistance(time) {
 
 export function animate(time) {
   barDuration = 1 / (audioData.info.bpm / 60)
-  render()
   object3d.rotation.y += 0.01
   textObject.position.y -= 4
-  particleSystem.rotation.y -= targetRotation
-
-  // sphereMesh.rotation.x = 1+velocityX*2
-  // sphereMesh.rotation.y = 1+velocityY*2
+  particleSystem.rotation.y -= 0.001
   sphereMesh.rotation.x += 0.01
   sphereMesh.rotation.y += 0.01
 
@@ -497,7 +492,8 @@ export function animate(time) {
   currentBar = barsByTime[audio.currentTime.toFixed(1)]
 
   if(currentBar && currentBar.start != lastBar.start) {
-    bumpBar()
+    console.log('currentBar', currentBar)
+    addBar(currentBar)
     lastBar = currentBar
   }
 
@@ -505,49 +501,35 @@ export function animate(time) {
     segmentLoudness = ((-100 - currentSegment.loudnessMax) * -1) / 100
 
     if(currentSegment && currentSegment.start != lastSegment.start) {
-
-      if(currentSegment.duration >= 0.4) {
-        // particles.bump(
-        //   Math.max(segmentLoudness, .99), 
-        //   'out', 
-        //   true, 
-        //   undefined, 
-        //   currentSegment.duration*1000)
-      }
-
-      noisePass.params.amount = (segmentLoudness/100)*10
+      noisePass.params.amount = (segmentLoudness/100)*5
       addSegment(currentSegment)
       bumpSegment(segmentLoudness, currentSegment.duration*1000)
-      lastSegment = currentSegment
-
-      
+      lastSegment = currentSegment 
     }
-
-    
   }
 
 
   if(currentScene && currentScene.start != lastScene.start) {
-    
-    const loudness = (-100-currentScene.loudness)*-1
-    targetRotation = loudness*0.0001
-    console.log('currentScene', currentScene)
-    //bumpScene(currentScene)
-    
     lastScene = currentScene  
   }
-  
-
+    
   TWEEN.update()
+  if(playing) analyser.getByteFrequencyData(frequencyData)
+  render()
   requestAnimationFrame(animate)
 }
 
 export function render() {
+
+  camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+  camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
+  camera.lookAt( scene.position );
+
   renderer.autoClearColor = true;
-  particles.update()
+  particles.update(frequencyData)
   composer.reset();
   composer.render( scene, camera );
-  composer.pass( dirtPass );
+  // composer.pass( dirtPass );
   composer.pass( chromaticAbberationPass );
   composer.pass( bloomPass );
   composer.pass( vignettePass );
@@ -561,7 +543,27 @@ export function render() {
 //EVENTS
 
 function onWindowResize() {
+  windowHalfX = window.innerWidth / 2;
+  windowHalfY = window.innerHeight / 2;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  composer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize( window.innerWidth, window.innerHeight );
+}
+function onDocumentMouseMove( event ) {
+  mouseX = event.clientX - windowHalfX;
+  mouseY = event.clientY - windowHalfY;
+}
+function onDocumentTouchStart( event ) {
+  if ( event.touches.length === 1 ) {
+    event.preventDefault();
+    mouseX = event.touches[ 0 ].pageX - windowHalfX;
+    mouseY = event.touches[ 0 ].pageY - windowHalfY;
+  }
+}
+function onDocumentTouchMove( event ) {
+  if ( event.touches.length === 1 ) {
+    event.preventDefault();
+    mouseX = event.touches[ 0 ].pageX - windowHalfX;
+    mouseY = event.touches[ 0 ].pageY - windowHalfY;
+  }
 }

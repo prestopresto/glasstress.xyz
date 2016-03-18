@@ -57199,6 +57199,7 @@
 	            'button',
 	            _extends({}, _this2.props, {
 	              style: {
+	                // backgroundColor: '#fff',
 	                transform: 'scale(' + values.scale + ')',
 	                border: '1px solid rgba(255, 255, 255, ' + values.opacity + ')',
 	                borderRadius: values.borderRadius
@@ -58104,8 +58105,22 @@
 	function fft(id) {
 
 	  var audio = document.getElementById('track');
+	  var audioContext = new AudioContext();
+	  var source = audioContext.createMediaElementSource(audio);
+	  var analyser = audioContext.createAnalyser();
 
-	  return { audio: audio };
+	  source.connect(analyser);
+	  analyser.connect(audioContext.destination);
+
+	  analyser.fftSize = 2048;
+
+	  var bufferLength = analyser.frequencyBinCount;
+	  var dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+	  // frequencyBinCount tells you how many values you'll receive from the analyser
+	  var frequencyData = new Uint8Array(analyser.frequencyBinCount);
+
+	  return { audio: audio, analyser: analyser };
 	}
 
 /***/ },
@@ -58159,7 +58174,7 @@
 	  // texture is blurry or pixelated, try increasing these
 	  // numbers, and drawing on the canvas in a larger font.
 	  canvas.width = 2400;
-	  canvas.height = 100;
+	  canvas.height = 150;
 
 	  // draw the score of "50" to the canvas
 	  var context = canvas.getContext('2d');
@@ -58255,37 +58270,42 @@
 	  return particleSystem;
 	}
 
-	function update() {
+	function update(frequencyData) {
 
 	  pCount = geometry.vertices.length;
 
-	  while (pCount--) {
+	  for (var i = 0; i < frequencyData.length; i++) {
+	    var particle = geometry.vertices[i];
+	    //particle.x -= 2
+	    particle.y = 100 + frequencyData[i];
 
-	    // get the particle
-	    var particle = geometry.vertices[pCount];
-
-	    // check if we need to reset
-	    if (particle.y < window.innerHeight * -1) {
-	      particle.y = window.innerHeight * 2;
-	      particle.velocity.y = 0;
-	    }
-
-	    // if (particle.x > window.innerWidth) {
-	    //   particle.x = -window.innerWidth;
-	    //   particle.velocity.x = 0;
+	    // if(particle.x < -window.innerWidth) {
+	    //   particle.x = window.innerWidth*2
 	    // }
-
-	    // update the velocity with
-	    // a splat of randomniz
-	    particle.velocity.x = Math.random() * 4 - 2;
-	    particle.velocity.y = Math.random() * 10 * -1;
-
-	    particle.y += particle.velocity.y;
-	    particle.x += particle.velocity.x;
-	    // and the position
-	    // particle.position.addSelf(
-	    //   particle.velocity);
 	  }
+
+	  // while (pCount--) {
+
+	  //   // get the particle
+	  //   var particle = geometry.vertices[pCount];
+
+	  //   // check if we need to reset
+	  //   if (particle.y < window.innerHeight*-1) {
+	  //     particle.y = window.innerHeight*2
+	  //     particle.velocity.y = 0;
+	  //   }
+
+	  //   // update the velocity with
+	  //   // a splat of randomniz
+	  //   particle.velocity.x = Math.random() * 4 - 2;
+	  //   particle.velocity.y = Math.random() * 10 * -1;
+
+	  //   particle.y += particle.velocity.y
+	  //   particle.x += particle.velocity.x
+	  //   // and the position
+	  //   // particle.position.addSelf(
+	  //   //   particle.velocity);
+	  // }
 
 	  // flag to the particle system
 	  // that we've changed its vertices.
@@ -58655,7 +58675,7 @@
 	                      onMouseOut: _this3.mouseOut,
 	                      onClick: _this3.launch.bind(_this3),
 	                      className: 'gt-button gt-button--launch',
-	                      label: 'launch visualization*' })
+	                      label: 'play*' })
 	                  );
 	                }
 	              ),
@@ -58763,6 +58783,7 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	window.THREE = _three2.default;
+
 	// threejs effects & plugins
 	__webpack_require__(129);
 
@@ -58770,7 +58791,8 @@
 
 	var screenX = window.innerWidth;
 	var screenY = window.innerHeight;
-
+	var windowHalfX = screenX / 2;
+	var windowHalfY = screenY / 2;
 	var scene;
 	var camera;
 	var renderer;
@@ -58800,6 +58822,7 @@
 	var _fft = (0, _fft3.default)();
 
 	var audio = _fft.audio;
+	var analyser = _fft.analyser;
 
 	var cameraZ = 0;
 	var sunlight;
@@ -58808,7 +58831,6 @@
 	var terrainMesh;
 	var sphereMesh;
 	var sphereMaterial;
-	var loudnessMax;
 	var center;
 	var dirtPass;
 	var blendPass;
@@ -58816,6 +58838,8 @@
 	var textObject;
 	var tethraGeometry = new _three2.default.TetrahedronGeometry(1120, 4);
 	var objects = [];
+	var bufferLength = analyser.frequencyBinCount;
+	var frequencyData = new Uint8Array(bufferLength);
 
 	var beatsByTime;
 	var segmentsByTime;
@@ -58825,6 +58849,7 @@
 
 	function setupAudioData(trackData) {
 	  (0, _audioData.setupData)(trackData);
+	  console.log('trackData', trackData);
 	  beatsByTime = (0, _audioData.getBeatsByTime)();
 	  segmentsByTime = (0, _audioData.getSegmentsByTime)();
 	  barsByTime = (0, _audioData.getBarsByTime)();
@@ -58833,6 +58858,11 @@
 	}
 
 	// UTILS
+
+	/* convert loudness scale from [-100,0] to [0,1] */
+	function getLoudness(loudness) {
+	  return (-100 - loudness) * -1 / 100;
+	}
 
 	function deg2rad() {}
 
@@ -58955,7 +58985,7 @@
 
 	  //sphereMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [material, mat])
 	  sphereMesh = new _three2.default.Mesh(geometry, material);
-	  //sphereMesh.position.z = -100
+	  sphereMesh.position.z = 1000;
 
 	  // RENDERER
 	  renderer = new _three2.default.WebGLRenderer({
@@ -58987,10 +59017,16 @@
 	  vignettePass.params.boost = 2;
 	  vignettePass.params.reduction = 3;
 	  noisePass = new WAGNER.NoisePass();
-	  noisePass.params.amount = .045;
+	  noisePass.params.amount = .015;
 	  chromaticAbberationPass = new WAGNER.ChromaticAberrationPass();
 	  chromaticAbberationPass.params.amount = 100;
 	  oldVideoPass = new WAGNER.OldVideoPass();
+
+	  document.addEventListener('mousemove', onDocumentMouseMove, false);
+	  document.addEventListener('touchstart', onDocumentTouchStart, false);
+	  document.addEventListener('touchmove', onDocumentTouchMove, false);
+	  //
+	  window.addEventListener('resize', onWindowResize, false);
 	}
 
 	function playScene() {
@@ -58998,69 +59034,63 @@
 	  audio.play();
 	  scene.add(sphereMesh);
 	  noisePass.params.speed = 1;
+	  playing = true;
+	}
+
+	function addBar(bar) {
+	  console.log('bar', bar.duration);
+	  var radius = 320;
+	  var geometry = new _three2.default.SphereGeometry(radius, 4, 4); //(radius, 32, 32);
+	  var material = new _three2.default.MeshPhongMaterial({
+	    color: Math.random() * 0xffffff,
+	    transparent: true,
+	    specular: Math.random() * 0xffffff,
+	    wireframe: true
+	  });
+	  var _mesh = new _three2.default.Mesh(geometry, material);
+	  _mesh.scale.set(0, 0, 0);
+	  scene.add(_mesh);
+
+	  new _tween2.default.Tween({ x: _mesh.position.x, scale: 0 }).to({ x: -screenX * 2, scale: 5 }, bar.duration * 1000).easing(_tween2.default.Easing.Quadratic.Out).onUpdate(function (t) {
+	    _mesh.scale.set(this.scale, this.scale, this.scale);
+	    _mesh.rotation.x += 0.1;
+	    _mesh.material.opacity = 1 - t;
+	  }).onComplete(function () {
+	    scene.remove(_mesh);
+	  }).start();
 	}
 
 	function addSegment(segment) {
 	  var radius = arguments.length <= 1 || arguments[1] === undefined ? 10 : arguments[1];
 	  var multiplyScalar = arguments.length <= 2 || arguments[2] === undefined ? 10 : arguments[2];
 
-	  // loudness 0-1
-	  loudnessMax = (-100 - segment.loudnessMax) * -1 / 100;
+
 	  var segmentLength = 12;
 
+	  // loudness 0-1
+	  var loudnessMin = getLoudness(segment.loudnessStart);
+	  var loudnessMax = getLoudness(segment.loudnessMax);
+
 	  for (var i = 0; i < 3; i++) {
-	    var _radius = logScale([0.72, 0.97], [1, 64], loudnessMax);
-
-	    var uniforms = {
-	      scale: { type: "f", value: _radius * 0.1 },
-	      displacement: { type: "f", value: _radius * 0.1 }
-	    };
-	    var vertexShader = document.getElementById('vertexShader').text;
-	    var fragmentShader = document.getElementById('fragmentShader').text;
-	    var material = new _three2.default.ShaderMaterial({
-	      uniforms: uniforms,
-	      vertexShader: vertexShader,
-	      fragmentShader: fragmentShader,
-	      transparent: true
-	    });
-
-	    //opacity: Math.random()
+	    var _radius = logScale([0.7, 0.99], [1, 96], loudnessMax);
 	    var geometry = new _three2.default.SphereGeometry(_radius, 1, 1); //(radius, 32, 32);
-
-	    // // material = new THREE.MeshBasicMaterial();
-	    //geometry.computeFaceNormals();
-	    //geometry.computeVertexNormals();
-
-	    //var geometry = new THREE.SphereGeometry( radius, 1, 1)
-
-	    var materialA = new _three2.default.MeshPhongMaterial({
-	      color: 0xffffff,
+	    var material = new _three2.default.MeshPhongMaterial({
+	      color: Math.random() * 0xffffff,
 	      transparent: true,
-	      //opacity: 1-loudnessMax,
-	      //shading: THREE.FlatShading,
 	      specular: Math.random() * 0xffffff,
 	      wireframe: true
 	    });
 
-	    var _mesh = new _three2.default.Mesh(geometry, materialA);
+	    var _mesh = new _three2.default.Mesh(geometry, material);
 
 	    _mesh.rotation.set(Math.random() * 1, Math.random() * 1, Math.random() * 1);
 	    _mesh.position.set(Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0);
-	    // _mesh.position.set(
-	    //   sphereMesh.rotation.x,
-	    //   sphereMesh.position.y,
-	    //   sphereMesh.position.z)
 	    _mesh.scale.set(1, 1, 0);
 	    _mesh.position.multiplyScalar(Math.random() * 500);
 	    _mesh.castShadow = true;
 	    _mesh.receiveShadow = false;
 
 	    object3d.add(_mesh);
-
-	    // sphereMesh.geometry.vertices = geometry.vertices
-	    // sphereMesh.geometry.verticesNeedUpdate=true
-	    // sphereMesh.geometry.__dirtyVertices=true
-
 	    tweenSegment(_mesh, loudnessMax, segment.duration, i * (segment.duration / segmentLength) * 1000);
 	  }
 	}
@@ -59076,7 +59106,7 @@
 	  var tween = new _tween2.default.Tween({ scale: 0 }).delay(delay).to({ scale: scale }, duration * 1000).easing(_tween2.default.Easing.Elastic.Out).onUpdate(function (t) {
 	    m.scale.set(this.scale, this.scale, this.scale);
 	  }).onComplete(function () {
-	    tweenSegmentOut(m, 2300, Math.random() * 3000, true);
+	    tweenSegmentOut(m, 1900, loudness * 1000, true);
 	  }).start();
 
 	  // var tween = new TWEEN
@@ -59123,13 +59153,15 @@
 	}
 
 	function bumpSegment(loudness, duration) {
-	  // var currentObj;
-	  // for(var i = 0; i < object3d.children.length; i++) {
-	  //   currentObj = object3d.children[i]
-	  //   if(currentObj) tweenSegmentOut(currentObj, duration, scalarValue, remove)
-	  // }
-
-	  new _tween2.default.Tween({ scaleMesh: 1, displacement: sphereUniforms.displacement.value, scale: sphereUniforms.scale.value }).to({ scaleMesh: loudnessMax, displacement: loudness * 500, scale: loudness * 4 }, duration).easing(_tween2.default.Easing.Quintic.InOut).onUpdate(function () {
+	  new _tween2.default.Tween({
+	    scaleMesh: 1,
+	    displacement: sphereUniforms.displacement.value,
+	    scale: sphereUniforms.scale.value
+	  }).to({
+	    scaleMesh: loudness,
+	    displacement: loudness * 500,
+	    scale: loudness * 4
+	  }, duration).easing(_tween2.default.Easing.Quintic.InOut).onUpdate(function () {
 	    sphereUniforms.displacement.value = this.displacement;
 	    sphereUniforms.scale.value = this.scale;
 	  }).start();
@@ -59140,22 +59172,6 @@
 
 	  new _tween2.default.Tween({ scaleMesh: 1 }).to({ scaleMesh: loudness * 0.07 }, currentScene.duration * 1000).easing(_tween2.default.Easing.Quintic.InOut).onUpdate(function () {
 	    sphereMesh.scale.set(this.scaleMesh, this.scaleMesh, this.scaleMesh);
-	  }).start();
-	}
-
-	function bumpBar() {
-	  var fromScale = arguments.length <= 0 || arguments[0] === undefined ? 0.2 : arguments[0];
-	  var scale = arguments.length <= 1 || arguments[1] === undefined ? 3 : arguments[1];
-	  var duration = arguments.length <= 2 || arguments[2] === undefined ? 2000 : arguments[2];
-	  var returnBack = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
-
-	  console.log('bar');
-	  new _tween2.default.Tween({ scale: fromScale }).to({ scale: scale }, duration).easing(_tween2.default.Easing.Quintic.InOut).onUpdate(function () {
-	    //sphereMesh.scale.set(this.scale, this.scale, this.scale)
-	    //sphereUniforms.scale.value = this.scale
-	    //sphereUniforms.displacement.value = this.scale*10
-	  }).onComplete(function () {
-	    if (returnBack) bumpBar(scale, fromScale, 300, false);
 	  }).start();
 	}
 
@@ -59203,6 +59219,7 @@
 	//   console.log('z', posZ)
 	// })
 
+	audio.currentTime = 60;
 	function getDistance(time) {
 	  var t = time / 1000;
 	  var distX = 1 * t + velocityX * Math.pow(t, 2) / 2;
@@ -59214,13 +59231,9 @@
 
 	function animate(time) {
 	  barDuration = 1 / (_audioData.audioData.info.bpm / 60);
-	  render();
 	  object3d.rotation.y += 0.01;
 	  textObject.position.y -= 4;
-	  particleSystem.rotation.y -= targetRotation;
-
-	  // sphereMesh.rotation.x = 1+velocityX*2
-	  // sphereMesh.rotation.y = 1+velocityY*2
+	  particleSystem.rotation.y -= 0.001;
 	  sphereMesh.rotation.x += 0.01;
 	  sphereMesh.rotation.y += 0.01;
 
@@ -59229,7 +59242,8 @@
 	  currentBar = barsByTime[audio.currentTime.toFixed(1)];
 
 	  if (currentBar && currentBar.start != lastBar.start) {
-	    bumpBar();
+	    console.log('currentBar', currentBar);
+	    addBar(currentBar);
 	    lastBar = currentBar;
 	  }
 
@@ -59237,17 +59251,7 @@
 	    segmentLoudness = (-100 - currentSegment.loudnessMax) * -1 / 100;
 
 	    if (currentSegment && currentSegment.start != lastSegment.start) {
-
-	      if (currentSegment.duration >= 0.4) {
-	        // particles.bump(
-	        //   Math.max(segmentLoudness, .99),
-	        //   'out',
-	        //   true,
-	        //   undefined,
-	        //   currentSegment.duration*1000)
-	      }
-
-	      noisePass.params.amount = segmentLoudness / 100 * 10;
+	      noisePass.params.amount = segmentLoudness / 100 * 5;
 	      addSegment(currentSegment);
 	      bumpSegment(segmentLoudness, currentSegment.duration * 1000);
 	      lastSegment = currentSegment;
@@ -59255,25 +59259,26 @@
 	  }
 
 	  if (currentScene && currentScene.start != lastScene.start) {
-
-	    var loudness = (-100 - currentScene.loudness) * -1;
-	    targetRotation = loudness * 0.0001;
-	    console.log('currentScene', currentScene);
-	    //bumpScene(currentScene)
-
 	    lastScene = currentScene;
 	  }
 
 	  _tween2.default.update();
+	  if (playing) analyser.getByteFrequencyData(frequencyData);
+	  render();
 	  requestAnimationFrame(animate);
 	}
 
 	function render() {
+
+	  camera.position.x += (mouseX - camera.position.x) * 0.05;
+	  camera.position.y += (-mouseY - camera.position.y) * 0.05;
+	  camera.lookAt(scene.position);
+
 	  renderer.autoClearColor = true;
-	  particles.update();
+	  particles.update(frequencyData);
 	  composer.reset();
 	  composer.render(scene, camera);
-	  composer.pass(dirtPass);
+	  // composer.pass( dirtPass );
 	  composer.pass(chromaticAbberationPass);
 	  composer.pass(bloomPass);
 	  composer.pass(vignettePass);
@@ -59286,9 +59291,29 @@
 	//EVENTS
 
 	function onWindowResize() {
+	  windowHalfX = window.innerWidth / 2;
+	  windowHalfY = window.innerHeight / 2;
 	  camera.aspect = window.innerWidth / window.innerHeight;
 	  camera.updateProjectionMatrix();
-	  composer.setSize(window.innerWidth, window.innerHeight);
+	  renderer.setSize(window.innerWidth, window.innerHeight);
+	}
+	function onDocumentMouseMove(event) {
+	  mouseX = event.clientX - windowHalfX;
+	  mouseY = event.clientY - windowHalfY;
+	}
+	function onDocumentTouchStart(event) {
+	  if (event.touches.length === 1) {
+	    event.preventDefault();
+	    mouseX = event.touches[0].pageX - windowHalfX;
+	    mouseY = event.touches[0].pageY - windowHalfY;
+	  }
+	}
+	function onDocumentTouchMove(event) {
+	  if (event.touches.length === 1) {
+	    event.preventDefault();
+	    mouseX = event.touches[0].pageX - windowHalfX;
+	    mouseY = event.touches[0].pageY - windowHalfY;
+	  }
 	}
 
 /***/ },

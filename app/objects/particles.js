@@ -50,37 +50,42 @@ export function setup(particleCount=2500, size=2) {
 }
 
 
-export function update() {
+export function update(frequencyData) {
 
   pCount = geometry.vertices.length;
   
-  while (pCount--) {
+  for(var i=0; i<frequencyData.length;i++) {
+    var particle = geometry.vertices[i];
+    //particle.x -= 2
+    particle.y = 100 + frequencyData[i]
 
-    // get the particle
-    var particle = geometry.vertices[pCount];
-
-    // check if we need to reset
-    if (particle.y < window.innerHeight*-1) {
-      particle.y = window.innerHeight*2
-      particle.velocity.y = 0;
-    }
-
-    // if (particle.x > window.innerWidth) {
-    //   particle.x = -window.innerWidth;
-    //   particle.velocity.x = 0;
+    // if(particle.x < -window.innerWidth) {
+    //   particle.x = window.innerWidth*2
     // }
-
-    // update the velocity with
-    // a splat of randomniz
-    particle.velocity.x = Math.random() * 4 - 2;
-    particle.velocity.y = Math.random() * 10 * -1;
-
-    particle.y += particle.velocity.y
-    particle.x += particle.velocity.x
-    // and the position
-    // particle.position.addSelf(
-    //   particle.velocity);
   }
+
+  // while (pCount--) {
+
+  //   // get the particle
+  //   var particle = geometry.vertices[pCount];
+
+  //   // check if we need to reset
+  //   if (particle.y < window.innerHeight*-1) {
+  //     particle.y = window.innerHeight*2
+  //     particle.velocity.y = 0;
+  //   }
+
+  //   // update the velocity with
+  //   // a splat of randomniz
+  //   particle.velocity.x = Math.random() * 4 - 2;
+  //   particle.velocity.y = Math.random() * 10 * -1;
+
+  //   particle.y += particle.velocity.y
+  //   particle.x += particle.velocity.x
+  //   // and the position
+  //   // particle.position.addSelf(
+  //   //   particle.velocity);
+  // }
 
   // flag to the particle system
   // that we've changed its vertices.
