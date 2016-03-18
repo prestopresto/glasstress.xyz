@@ -126,9 +126,9 @@ export default class Scene extends Component {
   render() {
 
     const { showLauncher, launched, pageIdx, showNavigation } = this.state
-    const springParamsA = {stiffness: 60, damping: 12, precision: 0.1}
-    const springParams = {stiffness: 20, damping: 20, precision: 0.1}
-    const springParamsAlt = {stiffness: 80, damping: 16, precision: 0.1}
+    const springParamsA = {stiffness: 40, damping: 15, precision: 0.10}
+    const springParams = {stiffness: 40, damping: 15, precision: 0.10}
+    const springParamsAlt = {stiffness: 40, damping: 15, precision: 0.10}
 
     let headerMotionStyle = {
       scale: spring(1), 
@@ -146,8 +146,8 @@ export default class Scene extends Component {
 
     if(launched) {
       headerMotionStyle.scale = spring(1.25, springParams)
-      headerMotionStyle.opacity =spring(.125, springParams)
-      headerMotionStyle.y = spring(180, springParams)
+      headerMotionStyle.opacity =spring(0, springParams)
+      headerMotionStyle.y = spring(280, springParams)
 
       buttonMotionStyle.scale = spring(1, springParams)
       buttonMotionStyle.y = spring(200, springParams)

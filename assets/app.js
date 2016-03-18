@@ -58554,9 +58554,9 @@
 	      var pageIdx = _state.pageIdx;
 	      var showNavigation = _state.showNavigation;
 
-	      var springParamsA = { stiffness: 60, damping: 12, precision: 0.1 };
-	      var springParams = { stiffness: 20, damping: 20, precision: 0.1 };
-	      var springParamsAlt = { stiffness: 80, damping: 16, precision: 0.1 };
+	      var springParamsA = { stiffness: 40, damping: 15, precision: 0.10 };
+	      var springParams = { stiffness: 40, damping: 15, precision: 0.10 };
+	      var springParamsAlt = { stiffness: 40, damping: 15, precision: 0.10 };
 
 	      var headerMotionStyle = {
 	        scale: (0, _reactMotion.spring)(1),
@@ -58574,8 +58574,8 @@
 
 	      if (launched) {
 	        headerMotionStyle.scale = (0, _reactMotion.spring)(1.25, springParams);
-	        headerMotionStyle.opacity = (0, _reactMotion.spring)(.125, springParams);
-	        headerMotionStyle.y = (0, _reactMotion.spring)(180, springParams);
+	        headerMotionStyle.opacity = (0, _reactMotion.spring)(0, springParams);
+	        headerMotionStyle.y = (0, _reactMotion.spring)(280, springParams);
 
 	        buttonMotionStyle.scale = (0, _reactMotion.spring)(1, springParams);
 	        buttonMotionStyle.y = (0, _reactMotion.spring)(200, springParams);
@@ -59285,7 +59285,7 @@
 	//   console.log('z', posZ)
 	// })
 
-	audio.currentTime = 60;
+	//audio.currentTime = 60
 	function getDistance(time) {
 	  var t = time / 1000;
 	  var distX = 1 * t + velocityX * Math.pow(t, 2) / 2;
