@@ -73,7 +73,7 @@ export default class Scene extends Component {
         }
       }, 250)
     }    
-    
+    this.typewrite()
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -188,6 +188,7 @@ export default class Scene extends Component {
         {this.state.launched && <div key="nowplaying" className="gt-screen__nowplaying">
           <span className="gt-screen__nowplaying-label gt-text--subhead">now playing</span>
           <h1 className="gt-screen__nowplaying-title">Like a Glass Angel</h1> 
+          <small>hold spacebar to change visualization mode</small>
         </div>}
       </Transition>
 
@@ -231,8 +232,8 @@ export default class Scene extends Component {
                     <TypeWriter word="glasstress" />
                   </h1>
                   <h2>
-                    {this.state.author==0 && <TypeWriter word="max/casacci" />}
-                    {this.state.author==1 && <TypeWriter word="daniele/mana" />}
+                    {this.state.author==0 && <TypeWriter word="max>casacci" />}
+                    {this.state.author==1 && <TypeWriter word="daniele>mana" />}
                   </h2>
                 </div>}
             </Motion>

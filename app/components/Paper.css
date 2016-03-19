@@ -5,11 +5,18 @@
 }
 
 .gt-paper-grid {
-  display: flex;
   width: 100%;
   min-height: 100vh;
   position: relative;
   z-index: 1000;
+  padding: 2em;
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 769px) {
+  .gt-paper-grid {
+    display: flex;
+  } 
 }
 
 .gt-paper__back {
@@ -23,7 +30,8 @@
 }
 
 .gt-paper__content {
-  padding: 2em 14em 2em 4em;
+  max-width: 720px;
+  padding-right: 8em;
 }
 
 .gt-paper__aside {
@@ -60,7 +68,7 @@
   letter-spacing: .25em;
 }
 .gt-paper__content-body p {
-  font-size: 1.25em;
+  font-size: 1.1em;
   font-weight: 100;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;

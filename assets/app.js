@@ -58113,18 +58113,29 @@
 	  var source = audioContext.createMediaElementSource(audio);
 	  var analyser = audioContext.createAnalyser();
 
+	  var filter = audioContext.createBiquadFilter();
+	  filter.type = filter.LOWPASS;
+	  filter.frequency.value = 5000;
+
+	  filter.frequency.value = 1;
+	  filter.Q.value = 10;
+
+	  // Connect source to filter, filter to destination.
+	  source.connect(filter);
+	  filter.connect(audioContext.destination);
+
 	  source.connect(analyser);
 	  analyser.connect(audioContext.destination);
-
+	  analyser.smoothingTimeConstant = 0.95;
 	  analyser.fftSize = 2048;
 
-	  var bufferLength = analyser.frequencyBinCount;
-	  var dataArray = new Uint8Array(analyser.frequencyBinCount);
+	  //var bufferLength = analyser.frequencyBinCount
+	  //var dataArray = new Uint8Array(analyser.frequencyBinCount)
 
 	  // frequencyBinCount tells you how many values you'll receive from the analyser
-	  var frequencyData = new Uint8Array(analyser.frequencyBinCount);
+	  //var frequencyData = new Uint8Array(analyser.frequencyBinCount)
 
-	  return { audio: audio, analyser: analyser };
+	  return { audio: audio, analyser: analyser, source: source };
 	}
 
 /***/ },
@@ -58263,6 +58274,7 @@
 	    particle.x = Math.random() * 10 - 5;
 	    particle.y = Math.random() * 10 - 5;
 	    particle.z = Math.random() * 10 - 5;
+	    particle.initialY = particle.y;
 	    particle.multiplyScalar(Math.random() * (800 - 700) + 700);
 
 	    particle.velocity = new _three2.default.Vector3(Math.random(), Math.random(), 0);
@@ -58280,8 +58292,7 @@
 
 	  for (var i = 0; i < frequencyData.length; i++) {
 	    var particle = geometry.vertices[i];
-	    //particle.x -= 2
-	    particle.y = 100 + frequencyData[i] * -3;
+	    particle.y = frequencyData[i] * -2;
 
 	    // if(particle.x < -window.innerWidth) {
 	    //   particle.x = window.innerWidth*2
@@ -58489,6 +58500,7 @@
 	          }
 	        }, 250);
 	      }
+	      this.typewrite();
 	    }
 	  }, {
 	    key: 'componentDidUpdate',
@@ -58625,6 +58637,11 @@
 	              'h1',
 	              { className: 'gt-screen__nowplaying-title' },
 	              'Like a Glass Angel'
+	            ),
+	            _react2.default.createElement(
+	              'small',
+	              null,
+	              'hold spacebar to change visualization mode'
 	            )
 	          )
 	        ),
@@ -58680,8 +58697,8 @@
 	                    _react2.default.createElement(
 	                      'h2',
 	                      null,
-	                      _this3.state.author == 0 && _react2.default.createElement(_TypeWriter2.default, { word: 'max/casacci' }),
-	                      _this3.state.author == 1 && _react2.default.createElement(_TypeWriter2.default, { word: 'daniele/mana' })
+	                      _this3.state.author == 0 && _react2.default.createElement(_TypeWriter2.default, { word: 'max>casacci' }),
+	                      _this3.state.author == 1 && _react2.default.createElement(_TypeWriter2.default, { word: 'daniele>mana' })
 	                    )
 	                  );
 	                }
@@ -58855,6 +58872,7 @@
 
 	var audio = _fft.audio;
 	var analyser = _fft.analyser;
+	var source = _fft.source;
 
 	var cameraZ = 0;
 	var sunlight;
@@ -58874,6 +58892,7 @@
 	var frequencyData = new Uint8Array(bufferLength);
 	var currentBeat;
 	var lastBeat = {};
+	var spacePressed = false;
 
 	var beatsByTime;
 	var segmentsByTime;
@@ -58939,21 +58958,21 @@
 	  //camera.rotation.x = -1
 
 	  // LIGHTS
-	  scene.add(new _three2.default.AmbientLight(0xffffff, 0.1));
+	  scene.add(new _three2.default.AmbientLight(0xffffff, 0.8));
 
 	  light = new _three2.default.DirectionalLight(0x3FBAC2, 0.1);
 	  light.castShadow = true;
-	  light.position.set(-80, 400, 4000);
+	  light.position.set(-800, -1200, 2000);
 	  scene.add(light);
 
-	  var light1 = new _three2.default.DirectionalLight(0xF64662, 0.1);
-	  light1.position.set(80, 120, 4000);
-	  scene.add(light1);
+	  // var light1 = new THREE.DirectionalLight( 0xF64662, 0.1 );
+	  // light1.position.set(80, 120, 4000)
+	  // scene.add(light1)
 
-	  var light2 = new _three2.default.DirectionalLight(0x92E0A9, 0.1);
-	  light2.position.set(80, -120, 4000);
-	  scene.add(light2);
-	  //scene.add(new THREE.CameraHelper( light.shadow.camera ))
+	  // var light2 = new THREE.DirectionalLight( 0x92E0A9, 0.1 );
+	  // light2.position.set(80, -120, 4000)
+	  // scene.add(light2)
+	  // //scene.add(new THREE.CameraHelper( light.shadow.camera ))
 
 	  // INTRO TEXT
 	  textObject = new _three2.default.Object3D();
@@ -59055,10 +59074,13 @@
 	  chromaticAbberationPass = new WAGNER.ChromaticAberrationPass();
 	  chromaticAbberationPass.params.amount = 100;
 	  oldVideoPass = new WAGNER.OldVideoPass();
+	  dotScreenPass = new WAGNER.DotScreenPass();
 
 	  document.addEventListener('mousemove', onDocumentMouseMove, false);
 	  document.addEventListener('touchstart', onDocumentTouchStart, false);
 	  document.addEventListener('touchmove', onDocumentTouchMove, false);
+	  document.addEventListener('keydown', onDocumentKeyDown, false);
+	  document.addEventListener('keyup', onDocumentKeyUp, false);
 	  //
 	  window.addEventListener('resize', onWindowResize, false);
 	}
@@ -59074,8 +59096,8 @@
 	var beats = [];
 
 	function addBeat(beat, num) {
-	  var radius = 120;
-	  var geometry = new _three2.default.SphereGeometry(radius, 1); //(radius, 32, 32);
+	  var radius = 12;
+	  var geometry = new _three2.default.TorusGeometry(radius, 0.5, 16, 3); //(radius, 32, 32);
 	  var material = new _three2.default.MeshPhongMaterial({
 	    color: Math.random() * 0xffffff,
 	    transparent: true,
@@ -59085,29 +59107,39 @@
 	  });
 	  var _mesh = new _three2.default.Mesh(geometry, material);
 	  _mesh.scale.set(1, 1, 1);
-	  _mesh.position.set(Math.random() * 1.0 - 0.5, Math.random() * 1.0 - 0.5, Math.random() - 0.1);
-	  _mesh.position.multiplyScalar(20000);
+	  //_mesh.position.set(Math.random()*1.0-0.5, Math.random()*1.0-0.5, Math.random()*-100)
+	  //_mesh.position.multiplyScalar(4000)
+	  _mesh.rotation.z = Math.random();
 	  scene.add(_mesh);
+	  //beats.push[_mesh]
 
-	  new _tween2.default.Tween({ y: _mesh.position.y, scale: 1 }).to({ y: screenY * 5, scale: beat.confidence * 10 }, beat.duration * 1000).easing(_tween2.default.Easing.Quadratic.Out).onUpdate(function (t) {
+	  new _tween2.default.Tween({ scale: 1 }).to({ scale: beat.confidence * 1000 }, beat.duration * 1000 * 2).easing(_tween2.default.Easing.Quadratic.Out).onUpdate(function (t) {
 	    _mesh.scale.set(this.scale, this.scale, this.scale);
 	    //_mesh.position.setY(this.y)
-	    _mesh.rotation.y += 0.1;
-	    //_mesh.material.opacity=1-t
+	    //_mesh.rotation.y += 0.1
+	    _mesh.material.opacity = 1 - t;
 	  }).onComplete(function () {
 	    //scene.remove(_mesh)
-	    new _tween2.default.Tween(_mesh.scale).delay(num * 10).to({ x: 1, y: 1, z: 1 }, beat.duration * 1000).onUpdate(function (t) {
-	      _mesh.material.opacity = 1 - t;
-	      _mesh.rotation.y -= 0.1;
-	    }).start();
+	    // new TWEEN
+	    //   .Tween(_mesh.scale)
+	    //   .delay(num*10)
+	    //   .to({x: 1, y: 1, z: 1}, beat.duration*1000)
+	    //   .onUpdate(function(t) {
+	    //     _mesh.material.opacity=1-t
+	    //     _mesh.rotation.y -= 0.1
+	    //   })
+	    //   .start()
+	    scene.remove(_mesh);
 	  }).start();
+
+	  console.log('num', num, num % 16);
 	}
 
 	function addBar(bar) {
 	  var radius = 320;
 	  var geometry = new _three2.default.SphereGeometry(radius, 4, 4); //(radius, 32, 32);
 	  var material = new _three2.default.MeshPhongMaterial({
-	    color: Math.random() * 0x121212,
+	    color: Math.random() * 0xffffff,
 	    transparent: true,
 	    specular: Math.random() * 0xffffff,
 	    //shading: THREE.FlatShading
@@ -59131,20 +59163,22 @@
 	  var multiplyScalar = arguments.length <= 2 || arguments[2] === undefined ? 10 : arguments[2];
 
 
-	  var segmentLength = 12;
-
 	  // loudness 0-1
 	  var loudnessMin = getLoudness(segment.loudnessStart);
 	  var loudnessMax = getLoudness(segment.loudnessMax);
 
-	  for (var i = 0; i < 3; i++) {
+	  var isLoud = loudnessMax >= 0.95;
+	  var segmentLength = isLoud ? 3 : 1;
+
+	  for (var i = 0; i < segmentLength; i++) {
 	    var _radius = logScale([0.7, 0.99], [1, 96], loudnessMax);
 	    var geometry = new _three2.default.SphereGeometry(_radius, 1, 1); //(radius, 32, 32);
 	    var material = new _three2.default.MeshPhongMaterial({
 	      color: Math.random() * 0xffffff,
 	      transparent: true,
 	      specular: Math.random() * 0xffffff,
-	      wireframe: loudnessMax >= 0.95 ? false : true
+	      wireframe: !isLoud,
+	      shading: isLoud ? _three2.default.FlatShading : _three2.default.SmoothShading
 	    });
 
 	    var _mesh = new _three2.default.Mesh(geometry, material);
@@ -59285,7 +59319,7 @@
 	//   console.log('z', posZ)
 	// })
 
-	//audio.currentTime = 60
+	audio.currentTime = 60;
 	function getDistance(time) {
 	  var t = time / 1000;
 	  var distX = 1 * t + velocityX * Math.pow(t, 2) / 2;
@@ -59316,17 +59350,12 @@
 
 	  if (currentBeat && currentBeat.start != lastBeat.start) {
 
-	    if (currentBeat) {
+	    if (beatsCount % 4 == 0) {
 	      console.log('beat', currentBeat.confidence);
-
 	      addBeat(currentBeat, beatsCount);
-
-	      if (beatsCount == 4) {
-	        beatsCount = 0;
-	      }
-	      beatsCount += 1;
 	    }
 
+	    beatsCount += 1;
 	    lastBeat = currentBeat;
 	  }
 
@@ -59363,10 +59392,19 @@
 	  composer.render(scene, camera);
 	  // composer.pass( dirtPass );
 	  composer.pass(chromaticAbberationPass);
-	  composer.pass(bloomPass);
+
+	  if (spacePressed) {
+	    //composer.pass(dotScreenPass)
+	    composer.pass(bloomPass);
+	  }
+	  //composer.pass( bloomPass );
 	  composer.pass(vignettePass);
 	  composer.pass(FXAAPass);
 	  composer.pass(noisePass);
+
+	  if (spacePressed) {
+	    composer.pass(dotScreenPass);
+	  }
 	  //composer.pass( oldVideoPass );
 	  composer.toScreen();
 	}
@@ -59396,6 +59434,20 @@
 	    event.preventDefault();
 	    mouseX = event.touches[0].pageX - windowHalfX;
 	    mouseY = event.touches[0].pageY - windowHalfY;
+	  }
+	}
+
+	function onDocumentKeyDown(evt) {
+	  // SPACEBAR
+	  if (evt.keyCode == 32) {
+	    spacePressed = true;
+	  }
+	}
+
+	function onDocumentKeyUp(evt) {
+	  // SPACEBAR
+	  if (evt.keyCode == 32) {
+	    spacePressed = false;
 	  }
 	}
 
@@ -63626,7 +63678,7 @@
 
 
 	// module
-	exports.push([module.id, ".gt-paper {\n  position: relative;\n  z-index: 1000;\n  background: rgba(0, 0, 0, .65);\n}\n\n.gt-paper-grid {\n  display: flex;\n  width: 100%;\n  min-height: 100vh;\n  position: relative;\n  z-index: 1000;\n}\n\n.gt-paper__back {\n  font-size: 1.25em;\n  font-weight: 100;\n  line-height: 1;\n  -webkit-font-smoothing: antialiased;\n  cursor: pointer;\n  letter-spacing: -.1em;\n  margin-bottom: .25em;\n}\n\n.gt-paper__content {\n  padding: 2em 14em 2em 4em;\n}\n\n.gt-paper__aside {\n  padding: 2em;\n}\n.gt-paper__content,\n.gt-paper__aside {\n  flex: 1;\n}\n\n.gt-paper__content-header {\n  border-top: 1px solid rgba(255, 255, 255, .125);\n  position: relative;\n  top: -1px;\n  /*overflow-x: hidden;*/\n  padding-bottom: 3em;\n  margin-bottom: 6em;\n  padding: 3em 0;\n}\n\n.gt-paper__content-header h1 {\n  font-size: 4em;\n  letter-spacing: -.05em;\n  line-height: 1;\n  margin: 0;\n}\n\n.gt-paper__content-header h2 {\n  color: #777;\n  margin-bottom: 1em;\n  margin-top: 3em;\n  font-weight: 800;\n  font-size: .7em;\n  letter-spacing: .25em;\n}\n.gt-paper__content-body p {\n  font-size: 1.25em;\n  font-weight: 100;\n  line-height: 1.7;\n  -webkit-font-smoothing: antialiased;\n}", ""]);
+	exports.push([module.id, ".gt-paper {\n  position: relative;\n  z-index: 1000;\n  background: rgba(0, 0, 0, .65);\n}\n\n.gt-paper-grid {\n  width: 100%;\n  min-height: 100vh;\n  position: relative;\n  z-index: 1000;\n  padding: 2em;\n  box-sizing: border-box;\n}\n\n@media screen and (min-width: 769px) {\n  .gt-paper-grid {\n    display: flex;\n  } \n}\n\n.gt-paper__back {\n  font-size: 1.25em;\n  font-weight: 100;\n  line-height: 1;\n  -webkit-font-smoothing: antialiased;\n  cursor: pointer;\n  letter-spacing: -.1em;\n  margin-bottom: .25em;\n}\n\n.gt-paper__content {\n  max-width: 720px;\n  padding-right: 8em;\n}\n\n.gt-paper__aside {\n  padding: 2em;\n}\n.gt-paper__content,\n.gt-paper__aside {\n  flex: 1;\n}\n\n.gt-paper__content-header {\n  border-top: 1px solid rgba(255, 255, 255, .125);\n  position: relative;\n  top: -1px;\n  /*overflow-x: hidden;*/\n  padding-bottom: 3em;\n  margin-bottom: 6em;\n  padding: 3em 0;\n}\n\n.gt-paper__content-header h1 {\n  font-size: 4em;\n  letter-spacing: -.05em;\n  line-height: 1;\n  margin: 0;\n}\n\n.gt-paper__content-header h2 {\n  color: #777;\n  margin-bottom: 1em;\n  margin-top: 3em;\n  font-weight: 800;\n  font-size: .7em;\n  letter-spacing: .25em;\n}\n.gt-paper__content-body p {\n  font-size: 1.1em;\n  font-weight: 100;\n  line-height: 1.7;\n  -webkit-font-smoothing: antialiased;\n}", ""]);
 
 	// exports
 
@@ -63654,7 +63706,7 @@
 
 
 	// module
-	exports.push([module.id, "html,\nbody {\n  font-family:Apercu, Proxima Nova, Fira Sans, Work Sans, Apercu, Helvetica Neue;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #212121;\n  background-size: cover;\n  position: relative;\n}\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n}", ""]);
+	exports.push([module.id, "html,\nbody {\n  font-family:Montserrat, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #212121;\n  background-size: cover;\n  position: relative;\n}\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n}", ""]);
 
 	// exports
 

@@ -47,7 +47,7 @@ var spotLight;
 var light;
 var object3d;
 var lastSegment = { start:0 };
-var { audio, analyser } = fft()
+var { audio, analyser, source } = fft()
 var cameraZ = 0
 var sunlight;
 var camControls;
@@ -66,6 +66,7 @@ var bufferLength = analyser.frequencyBinCount;
 var frequencyData = new Uint8Array(bufferLength)
 var currentBeat;
 var lastBeat = {};
+var spacePressed = false;
 
 import { setupData, audioData, getBeatsByTime, getSegmentsByTime, getBarsByTime, getTatumsByTime, getScenesByTime } from '../lib/audio-data'
 import { TextMesh } from '../objects/Text'
@@ -136,21 +137,21 @@ export function init() {
   //camera.rotation.x = -1
 
   // LIGHTS
-  scene.add(new THREE.AmbientLight( 0xffffff, 0.1 ))
+  scene.add(new THREE.AmbientLight( 0xffffff, 0.8 ))
   
   light = new THREE.DirectionalLight( 0x3FBAC2, 0.1 );
   light.castShadow = true;
-  light.position.set(-80, 400, 4000)
+  light.position.set(-800, -1200, 2000)
   scene.add(light)
 
-  var light1 = new THREE.DirectionalLight( 0xF64662, 0.1 );
-  light1.position.set(80, 120, 4000)
-  scene.add(light1)
+  // var light1 = new THREE.DirectionalLight( 0xF64662, 0.1 );
+  // light1.position.set(80, 120, 4000)
+  // scene.add(light1)
 
-  var light2 = new THREE.DirectionalLight( 0x92E0A9, 0.1 );
-  light2.position.set(80, -120, 4000)
-  scene.add(light2)
-  //scene.add(new THREE.CameraHelper( light.shadow.camera ))
+  // var light2 = new THREE.DirectionalLight( 0x92E0A9, 0.1 );
+  // light2.position.set(80, -120, 4000)
+  // scene.add(light2)
+  // //scene.add(new THREE.CameraHelper( light.shadow.camera ))
 
 
   // INTRO TEXT
@@ -254,10 +255,13 @@ export function init() {
   chromaticAbberationPass = new WAGNER.ChromaticAberrationPass();
   chromaticAbberationPass.params.amount = 100
   oldVideoPass = new WAGNER.OldVideoPass()
+  dotScreenPass = new WAGNER.DotScreenPass()
 
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
   document.addEventListener( 'touchstart', onDocumentTouchStart, false );
   document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+  document.addEventListener( 'keydown', onDocumentKeyDown, false);
+  document.addEventListener( 'keyup', onDocumentKeyUp, false);
   //
   window.addEventListener( 'resize', onWindowResize, false );
 }
@@ -274,8 +278,8 @@ export function playScene() {
 let beats=[]
 
 function addBeat(beat, num) {
-  const radius = 120
-  const geometry = new THREE.SphereGeometry( radius, 1)//(radius, 32, 32);
+  const radius = 12
+  const geometry = new THREE.TorusGeometry( radius, 0.5, 16, 3)//(radius, 32, 32);
   const material = new THREE.MeshPhongMaterial({
     color: Math.random()*0xffffff, 
     transparent: true,
@@ -285,40 +289,45 @@ function addBeat(beat, num) {
   })
   const _mesh = new THREE.Mesh(geometry, material)
   _mesh.scale.set(1,1,1)
-  _mesh.position.set(Math.random()*1.0-0.5, Math.random()*1.0-0.5, Math.random()-0.1)
-  _mesh.position.multiplyScalar(20000)
+  //_mesh.position.set(Math.random()*1.0-0.5, Math.random()*1.0-0.5, Math.random()*-100)
+  //_mesh.position.multiplyScalar(4000)
+  _mesh.rotation.z = Math.random()
   scene.add(_mesh)
+  //beats.push[_mesh]
 
   new TWEEN
-    .Tween({y: _mesh.position.y, scale: 1})
-    .to({y: screenY*5, scale: beat.confidence*10}, beat.duration*1000)
+    .Tween({scale: 1})
+    .to({scale: beat.confidence*1000}, beat.duration*1000*2)
     .easing(TWEEN.Easing.Quadratic.Out)
     .onUpdate(function(t) {
       _mesh.scale.set(this.scale, this.scale, this.scale)
       //_mesh.position.setY(this.y)
-      _mesh.rotation.y += 0.1
-      //_mesh.material.opacity=1-t
+      //_mesh.rotation.y += 0.1
+      _mesh.material.opacity=1-t
     })
     .onComplete(function() {
       //scene.remove(_mesh)
-      new TWEEN
-        .Tween(_mesh.scale)
-        .delay(num*10)
-        .to({x: 1, y: 1, z: 1}, beat.duration*1000)
-        .onUpdate(function(t) {
-          _mesh.material.opacity=1-t
-          _mesh.rotation.y -= 0.1
-        })
-        .start()
+      // new TWEEN
+      //   .Tween(_mesh.scale)
+      //   .delay(num*10)
+      //   .to({x: 1, y: 1, z: 1}, beat.duration*1000)
+      //   .onUpdate(function(t) {
+      //     _mesh.material.opacity=1-t
+      //     _mesh.rotation.y -= 0.1
+      //   })
+      //   .start()
+      scene.remove(_mesh)
     })
     .start()
+
+  console.log('num', num, num % 16)
 }
 
 function addBar(bar) {
   const radius = 320
   const geometry = new THREE.SphereGeometry( radius, 4, 4 )//(radius, 32, 32);
   const material = new THREE.MeshPhongMaterial({
-    color: Math.random()*0x121212, 
+    color: Math.random()*0xffffff, 
     transparent: true,
     specular: Math.random() * 0xffffff,
     //shading: THREE.FlatShading
@@ -345,21 +354,22 @@ function addBar(bar) {
 
 function addSegment(segment, radius=10, multiplyScalar=10) {
   
-  const segmentLength = 12
-  
-
   // loudness 0-1
   const loudnessMin = getLoudness(segment.loudnessStart)
   const loudnessMax = getLoudness(segment.loudnessMax)
 
-  for(var i = 0; i < 3; i++) {
+  const isLoud = loudnessMax >= 0.95
+  const segmentLength = isLoud ? 3 : 1
+
+  for(var i = 0; i < segmentLength; i++) {
     const radius = logScale([0.7, 0.99], [1, 96], loudnessMax)
     const geometry = new THREE.SphereGeometry( radius, 1, 1 )//(radius, 32, 32);
     const material = new THREE.MeshPhongMaterial({
       color: Math.random()*0xffffff, 
       transparent: true,
       specular: Math.random() * 0xffffff,
-      wireframe: loudnessMax >= 0.95 ? false : true
+      wireframe: !isLoud,
+      shading: isLoud ? THREE.FlatShading : THREE.SmoothShading
     })
 
     const _mesh = new THREE.Mesh(geometry, material)
@@ -514,7 +524,7 @@ var distanceY = 0, velocityY = 0
 //   console.log('z', posZ)
 // })
 
-//audio.currentTime = 60
+audio.currentTime = 60
 function getDistance(time) {
   var t = time/1000
   var distX = 1*(t)+(velocityX*Math.pow(t, 2))/2
@@ -545,17 +555,12 @@ export function animate(time) {
 
   if(currentBeat && currentBeat.start != lastBeat.start) {
     
-    if(currentBeat) {
+    if(beatsCount % 4 == 0) {
       console.log('beat', currentBeat.confidence)
-      
-      addBeat(currentBeat, beatsCount)
-
-      if(beatsCount == 4) {
-        beatsCount = 0
-      }
-      beatsCount+=1
+      addBeat(currentBeat, beatsCount)  
     }
 
+    beatsCount+=1
     lastBeat = currentBeat
     
   }
@@ -595,10 +600,19 @@ export function render() {
   composer.render( scene, camera );
   // composer.pass( dirtPass );
   composer.pass( chromaticAbberationPass );
-  composer.pass( bloomPass );
+
+  if(spacePressed) {
+    //composer.pass(dotScreenPass)
+    composer.pass( bloomPass );
+  }
+  //composer.pass( bloomPass );
   composer.pass( vignettePass );
   composer.pass( FXAAPass );
   composer.pass( noisePass );
+  
+  if(spacePressed) {
+    composer.pass(dotScreenPass)
+  }
   //composer.pass( oldVideoPass );
   composer.toScreen();
 }
@@ -629,5 +643,19 @@ function onDocumentTouchMove( event ) {
     event.preventDefault();
     mouseX = event.touches[ 0 ].pageX - windowHalfX;
     mouseY = event.touches[ 0 ].pageY - windowHalfY;
+  }
+}
+
+function onDocumentKeyDown(evt) {
+  // SPACEBAR
+  if(evt.keyCode==32) {
+    spacePressed=true
+  }
+}
+
+function onDocumentKeyUp(evt) {
+  // SPACEBAR
+  if(evt.keyCode==32) {
+    spacePressed=false
   }
 }

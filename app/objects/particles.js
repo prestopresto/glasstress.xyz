@@ -36,6 +36,7 @@ export function setup(particleCount=2500, size=2) {
     particle.x = Math.random() * 10 - 5 
     particle.y = Math.random() * 10 - 5 
     particle.z = Math.random() * 10 - 5
+    particle.initialY = particle.y
     particle.multiplyScalar(Math.random() * (800 - 700) + 700);    
 
     particle.velocity = new THREE.Vector3(
@@ -56,8 +57,7 @@ export function update(frequencyData) {
   
   for(var i=0; i<frequencyData.length;i++) {
     var particle = geometry.vertices[i];
-    //particle.x -= 2
-    particle.y = 100 + frequencyData[i]*-3
+    particle.y = frequencyData[i]*-2
 
     // if(particle.x < -window.innerWidth) {
     //   particle.x = window.innerWidth*2
