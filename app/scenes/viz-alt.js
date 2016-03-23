@@ -531,7 +531,7 @@ var distanceY = 0, velocityY = 0
 //   console.log('z', posZ)
 // })
 
-audio.currentTime = 0
+//audio.currentTime = 0
 function getDistance(time) {
   var t = time/1000
   var distX = 1*(t)+(velocityX*Math.pow(t, 2))/2
