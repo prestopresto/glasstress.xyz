@@ -5,7 +5,8 @@ function getAudioContext() {
 export default function fft(id) {
 
   var audio = document.getElementById('track')
-  var audioCtx = new AudioContext()
+  var AudioCtx = getAudioContext()
+  var audioCtx = new AudioCtx()
   var source = audioCtx.createMediaElementSource(audio)
 
   //set up the different audio nodes we will use for the app
