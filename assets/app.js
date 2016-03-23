@@ -59440,14 +59440,14 @@
 	}
 	function onDocumentTouchStart(event) {
 	  if (event.touches.length === 1) {
-	    event.preventDefault();
+	    //event.preventDefault();
 	    mouseX = event.touches[0].pageX - windowHalfX;
 	    mouseY = event.touches[0].pageY - windowHalfY;
 	  }
 	}
 	function onDocumentTouchMove(event) {
 	  if (event.touches.length === 1) {
-	    event.preventDefault();
+	    //event.preventDefault();
 	    mouseX = event.touches[0].pageX - windowHalfX;
 	    mouseY = event.touches[0].pageY - windowHalfY;
 	  }
@@ -63736,7 +63736,7 @@
 
 
 	// module
-	exports.push([module.id, "/* VISUALIZATION */\n.gt-viz {\n  position: fixed;\n  top: 0;\n  left: 0;\n  height: 100%;\n  pointer-events: none;\n}\n\n\n/* SCREEN */\n.gt-screen {\n  display: flex;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n}\n\n/* NAVIGATION */\n.gt-screen__icosahedron {\n  position: fixed;\n  right: 1em;\n  top: 1em;\n  z-index: 9999;\n}\n\n/* NOW PLAYING */\n.gt-screen__nowplaying {\n  position: fixed;\n  left: 2em;\n  bottom: 2em;\n}\n\n.gt-screen__nowplaying-title {\n  margin: 0;\n  padding: 0;\n  font-size: 1.5em;\n  margin-top: -.25em;\n  font-weight: 100;\n  text-transform: lowercase;\n  position: relative;\n  left: -1px;\n}\n\n.gt-gt--nowplaying {\n  position: absolute;\n  left: -1em;\n  top: -1em;\n  font-size: .5em;\n}\n\n/* HERO */\n.gt-screen__title {\n\n  text-align: center;\n  margin: 0 auto;\n  /*display: flex;*/\n  align-items: flex-start;\n  justify-content: center;\n  background: rgba(255, 240, 245, .95);\n  color: #444;\n  padding: 4em;\n  position: relative;\n  z-index: 1;\n  border: 1px solid rgba(255, 255, 255, .25);\n  box-shadow:  \n    16px 0 32px rgba(30, 45, 200, .45),\n    -16px 0 32px rgba(250, 40, 30, .5);\n  border-radius: 50%;\n}\n\n.gt-title,\n.gt-subtitle {\n  margin: 0;\n  line-height: 1;\n  /**/\n}\n\n.gt-title {\n  font-size: 1.75em;\n  text-align: center;\n}\n\n.gt-title .gt-typewriter span {\n  width: 1.25em;\n}\n\n.gt-subtitle {\n  font-weight: 100;\n  font-size: .7em;\n  margin-top: 1em;\n}\n\n.gt-button--launch {\n  background: transparent;\n  margin-top: 2em;\n  border: transparent;\n}", ""]);
+	exports.push([module.id, "/* VISUALIZATION */\n.gt-viz {\n  position: fixed;\n  top: 0;\n  left: 0;\n  height: 100%;\n}\n\n\n/* SCREEN */\n.gt-screen {\n  display: flex;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n}\n\n/* NAVIGATION */\n.gt-screen__icosahedron {\n  position: fixed;\n  right: 1em;\n  top: 1em;\n  z-index: 9999;\n}\n\n/* NOW PLAYING */\n.gt-screen__nowplaying {\n  position: fixed;\n  left: 2em;\n  bottom: 2em;\n}\n\n.gt-screen__nowplaying-title {\n  margin: 0;\n  padding: 0;\n  font-size: 1.5em;\n  margin-top: -.25em;\n  font-weight: 100;\n  text-transform: lowercase;\n  position: relative;\n  left: -1px;\n}\n\n.gt-gt--nowplaying {\n  position: absolute;\n  left: -1em;\n  top: -1em;\n  font-size: .5em;\n}\n\n/* HERO */\n.gt-screen__title {\n\n  text-align: center;\n  margin: 0 auto;\n  /*display: flex;*/\n  align-items: flex-start;\n  justify-content: center;\n  background: rgba(255, 240, 245, .95);\n  color: #444;\n  padding: 4em;\n  position: relative;\n  z-index: 1000;\n  border: 1px solid rgba(255, 255, 255, .25);\n  box-shadow:  \n    16px 0 32px rgba(30, 45, 200, .45),\n    -16px 0 32px rgba(250, 40, 30, .5);\n  border-radius: 50%;\n}\n\n.gt-title,\n.gt-subtitle {\n  margin: 0;\n  line-height: 1;\n  /**/\n}\n\n.gt-title {\n  font-size: 1.75em;\n  text-align: center;\n}\n\n.gt-title .gt-typewriter span {\n  width: 1.25em;\n}\n\n.gt-subtitle {\n  font-weight: 100;\n  font-size: .7em;\n  margin-top: 1em;\n}\n\n.gt-button--launch {\n  background: transparent;\n  margin-top: 2em;\n  border: transparent;\n}", ""]);
 
 	// exports
 
