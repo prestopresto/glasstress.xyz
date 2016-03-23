@@ -1,7 +1,9 @@
 .gt-paper {
   position: relative;
   z-index: 1000;
-  background: rgba(0, 0, 0, .65);
+  /*background: rgba(0, 0, 0, .65);*/
+  /*background: #fff;*/
+  color: #444;
 }
 
 .gt-paper-grid {
@@ -63,7 +65,7 @@
   color: #777;
   margin-bottom: 1em;
   margin-top: 3em;
-  font-weight: 800;
+  font-weight: 400;
   font-size: .7em;
   letter-spacing: .25em;
 }

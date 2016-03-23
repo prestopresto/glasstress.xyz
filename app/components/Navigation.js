@@ -7,13 +7,13 @@ import TypeWriter from '../components/TypeWriter'
 const items = [
   {
     title: "The Project",
-    subtitle: "00.About",
+    subtitle: "00>About",
     href: "project",
     id: 0,
   },
   {
     title: "Tracklist",
-    subtitle: "01.Listen",
+    subtitle: "01>Listen",
     href: "tracklist",
     id: 2,
     aside: (
@@ -23,7 +23,7 @@ const items = [
   },
   {
     title: "Masterpieces",
-    subtitle: "02.See",
+    subtitle: "02>See",
     href: "masterpieces",
     id: 3
   },
@@ -104,7 +104,8 @@ export default class Navigation extends Component {
                 width: '100%',
                 height: '100%',
                 color: '#ababab',
-                pointerEvents: show ? 'inherit' : 'none'
+                pointerEvents: show ? 'inherit' : 'none',
+                zIndex: -1
               }}>
               
               <div style={{

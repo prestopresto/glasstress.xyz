@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom'
 import Scene from "./scenes"
 
 require('./styles/normalize.css')
+require('./styles/font-face.css')
 require('./styles/body.css')
 require('./styles/content.css')
 

@@ -1,13 +1,15 @@
 html,
 body {
-  font-family:Montserrat, Helvetica Neue, sans-serif;
+  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;
   color: #fff;
   /*background-image: url(/assets/imgs/bg@2x.jpg);*/
   /*background: linear-gradient(#35013F, #EB5033);*/
   background: #212121;
   background-size: cover;
   position: relative;
+  min-height: 100%;
 }
+
 
 a,
 a:link {
@@ -25,4 +27,5 @@ p, .serif, .gt-text--serif {
   letter-spacing: .1em;
   /*border-bottom: 2px solid;*/
   text-transform: uppercase;
+  font-weight: 900;
 }

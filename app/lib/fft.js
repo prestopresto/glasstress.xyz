@@ -5,23 +5,45 @@ function getAudioContext() {
 export default function fft(id) {
 
   var audio = document.getElementById('track')
-  var audioContext = new AudioContext()
-  var source = audioContext.createMediaElementSource(audio)
-  var analyser = audioContext.createAnalyser()
+  var audioCtx = new AudioContext()
+  var source = audioCtx.createMediaElementSource(audio)
 
-  var filter = audioContext.createBiquadFilter();
-  filter.type = filter.LOWPASS;
-  filter.frequency.value = 5000;
-  
-  filter.frequency.value = 1;
-  filter.Q.value = 10
+  //set up the different audio nodes we will use for the app
+  var analyser = audioCtx.createAnalyser();
+  var distortion = audioCtx.createWaveShaper();
+  var gainNode = audioCtx.createGain();
+  var biquadFilter = audioCtx.createBiquadFilter();
+  var convolver = audioCtx.createConvolver();
 
-  // Connect source to filter, filter to destination.
-  source.connect(filter);
-  filter.connect(audioContext.destination);
-
+  // connect the nodes together
   source.connect(analyser);
-  analyser.connect(audioContext.destination)
+  analyser.connect(distortion);
+  distortion.connect(biquadFilter);
+  biquadFilter.connect(convolver);
+  // convolver.connect(gainNode);
+  //biquadFilter.connect(audioCtx.destination);
+  analyser.connect(audioCtx.destination)
+  biquadFilter.type = "lowshelf";
+  biquadFilter.frequency.value = 1000;
+  biquadFilter.gain.value = 25;
+
+  // Create a gain node
+  // var gainNode = audioCtx.createGain();
+  // var analyser = audioCtx.createAnalyser()
+  
+  // var filter = audioCtx.createBiquadFilter();
+  // filter.type = filter.LOWPASS;
+  // filter.frequency.value = 5000;
+  
+  // filter.frequency.value = 1;
+  // filter.Q.value = 10
+
+  // source.connect(analyser);
+  // analyser.connect(filter)
+  // filter.connect(gainNode);
+  // gainNode.connect(audioCtx.destination);
+  
+
   analyser.smoothingTimeConstant = 0.95;
   analyser.fftSize = 2048
 

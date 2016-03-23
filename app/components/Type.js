@@ -74,7 +74,6 @@ export default class Type extends Component {
   // methods
   render() {
     return <span style={{
-        display: 'inline-block',
         opacity: this.state.opacity,
         transform: 'scale('+this.state.scale+')'
       }}>{this.state.char}</span>

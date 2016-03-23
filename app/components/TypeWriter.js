@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Type from './Type'
 
+require('./TypeWriter.css')
+
 export default class TypeWriter extends Component {
   constructor(props) {
     // code
@@ -14,7 +16,7 @@ export default class TypeWriter extends Component {
 
 
     return (
-      <span ref={(ref) => {
+      <span className="gt-typewriter" ref={(ref) => {
         this.ref = ref
       }}>
         {

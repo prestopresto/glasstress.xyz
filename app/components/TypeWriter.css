@@ -1,0 +1,11 @@
+.gt-typewriter {
+
+}
+
+.gt-typewriter span {
+  display: inline-block;
+  width: 1.1em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: .25em;
+}

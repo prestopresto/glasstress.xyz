@@ -81,7 +81,7 @@ export default class Scene extends Component {
     if(this.state.launched && !prevState.launched) {
       setTimeout(() => {
         visualization.playScene()
-      }, 0)
+      }, 2000)
       
     }
   }
@@ -126,7 +126,7 @@ export default class Scene extends Component {
   render() {
 
     const { showLauncher, launched, pageIdx, showNavigation } = this.state
-    const springParamsA = {stiffness: 40, damping: 15, precision: 0.10}
+    const springParamsA = {stiffness: 10, damping: 4, precision: 0.10}
     const springParams = {stiffness: 40, damping: 15, precision: 0.10}
     const springParamsAlt = {stiffness: 40, damping: 15, precision: 0.10}
 
@@ -163,110 +163,95 @@ export default class Scene extends Component {
 
     return <div>
 
-      {/* NAVIGATION */}
-      <div className="gt-screen__icosahedron">
-        <Navigation 
-          onToggle={this.toggleNavigation.bind(this)}
-          onNavigate={this.navigate.bind(this)} />
-      </div>
+      <div className="gt-screen">
 
-      {/* VISUALIZATION PLACEHOLDER */}
-      <div id="visualization" />
+        {/* VISUALIZATION PLACEHOLDER */}
+        <div id="visualization" className="gt-viz" />
 
-      {/* NOW PLAYING */}
-      <Transition
-        runOnMount={true}
-        component={false} // don't use a wrapping component
-        enter={{
-          opacity: 1,
-          translateY: spring(0)
-        }}
-        leave={{
-          opacity: 0,
-          translateY: 0
-        }}>
-        {this.state.launched && <div key="nowplaying" className="gt-screen__nowplaying">
-          <span className="gt-screen__nowplaying-label gt-text--subhead">now playing</span>
-          <h1 className="gt-screen__nowplaying-title">Like a Glass Angel</h1> 
-          <small>hold spacebar to change visualization mode</small>
-        </div>}
-      </Transition>
+        {/* NAVIGATION */}
+        <div className="gt-screen__icosahedron">
+          <Navigation 
+            onToggle={this.toggleNavigation.bind(this)}
+            onNavigate={this.navigate.bind(this)} />
+        </div>
 
-      <div className="gt-screen__toolbar">
-        toolbar
-      </div>
-
-
-      <Motion
-        defaultStyle={{
-          scale: 1, 
-          opacity: 1,
-          y: 0
-        }} 
-        style={{
-          scale: !showLauncher ? spring(.9, springParamsAlt) : spring(1),
-          opacity: !showLauncher ? spring(0, springParamsAlt) : spring(1),
-          y: !showLauncher ? spring(-100, springParamsAlt) : spring(0),
-        }}>
-        {values => 
-          <div 
-            style={{
-              opacity: values.opacity,
-              transform: `translate3d(0, ${values.y}vh, 0) scale(${values.scale})`,
-            }}
-            className="gt-screen gt-screen--home">
-            <Motion 
-              defaultStyle={{
-                scale: 1, 
-                y: 0,
-                opacity: 1,
-                x: 0
-              }} 
-              style={headerMotionStyle}>
-              {values => 
-                <div style={{
-                  transform: `translate3d(${values.x}px, ${values.y}px, 0) scale(${values.scale})`,
-                  opacity: values.opacity
-                }} className="gt-screen__title">
-                  <h1 className="gt-title">
-                    <TypeWriter word="glasstress" />
-                  </h1>
-                  <h2>
-                    {this.state.author==0 && <TypeWriter word="max>casacci" />}
-                    {this.state.author==1 && <TypeWriter word="daniele>mana" />}
-                  </h2>
-                </div>}
-            </Motion>
-
-            {this.state.canLaunch && <Motion defaultStyle={{
-                scale: 1,
-                opacity: 1, 
-                y: 0,
-                x: 0
-              }} 
-              style={buttonMotionStyle}>
-              {values => 
-                <div style={{
-                  transform: `translate3d(${values.x}px, ${values.y}px, 0)  scale(${values.scale})`,
-                  opacity: values.opacity
-                }} className="gt-screen__action">
-                  <MotionButton 
-                    onMouseOver={this.mouseOver}
-                    onMouseOut={this.mouseOut}
-                    onClick={this.launch.bind(this)}
-                    className="gt-button gt-button--launch"
-                    label="play*" /> 
-                </div>}
-            </Motion>}
-
-            {!this.state.canLaunch && <div className="gt-screen__action">
-              <span>loading audio data...</span>
-            </div>}
+        {/* NOW PLAYING */}
+        <Transition
+          runOnMount={true}
+          component={false}
+          enter={{
+            opacity: 1,
+            translateY: 0
+          }}
+          leave={{
+            opacity: 0,
+            translateY: 20
+          }}>
+          {this.state.launched && <div key="nowplaying" className="gt-screen__nowplaying">
+            <span className="gt-gt--nowplaying">
+              &gt;
+            </span>
+            <span className="gt-screen__nowplaying-label gt-text--subhead">
+              now playing
+            </span>
+            <h1 className="gt-screen__nowplaying-title">
+              Like a Glass Angel
+            </h1>
           </div>}
-      </Motion>
+        </Transition>
+
+        {/* VIZ TOOLBAR */}
+        <div className="gt-screen__toolbar">
+          toolbar
+        </div>
+        
+        {/* HERO */}
+        <Transition
+          runOnMount={true}
+          component={false}
+          appear={{
+            scale: 1,
+            opacity: 0,
+          }}
+          enter={{
+            opacity: spring(1, {stiffness:5, damping:10}),
+            translateY: spring(0),
+            scale: spring(1, {stiffness:20, damping:10})
+          }}
+          leave={{
+            opacity: spring(0, {stiffness:20, damping:10}),
+            translateY: 0,
+            scale: spring(0, {stiffness:20, damping:10})
+          }}>
+        {!this.state.launched && <div key="title" className="gt-screen__title">
+            <h1 className="gt-title">
+              <TypeWriter word="glass" />
+            </h1>
+            <h1 className="gt-title">
+              <TypeWriter word="tress" />
+            </h1>
+            <h2 className="gt-subtitle">
+              {this.state.author==0 && <TypeWriter word="max>casacci" />}
+              {this.state.author==1 && <TypeWriter word="daniele>mana" />}
+            </h2>
+            {/* LOADER */}
+            {this.state.canLaunch && 
+            <MotionButton 
+              onMouseOver={this.mouseOver}
+              onMouseOut={this.mouseOut}
+              onClick={this.launch.bind(this)}
+              className="gt-button gt-button--launch"
+              label="play*" />}
+          </div>}
+        </Transition>
 
 
 
+        
+
+      </div>
+      
+      {/* CONTENT DRAWER */}
       <Transition
         runOnMount={true}
         component={false} // don't use a wrapping component

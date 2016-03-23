@@ -1,0 +1,41 @@
+
+/* tracklist */
+.gt-track--tracklist {
+  display: flex;
+  line-height: 1;
+  align-items: center;
+  padding: 1.5em 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .1)
+}
+
+.gt-track__pos {
+  width: 40px;
+  margin-left: -40px;
+  opacity: .275;
+  font-size: .6em;
+  align-self: flex-start;
+  font-weight: 800;
+}
+
+.gt-track__track {
+  /* flex: 1; */
+  font-size: 1.5em;
+  font-weight: 100;
+}
+
+.gt-track__duration {
+  width: 80px;
+  margin-left: auto;
+  text-align: right;
+  font-weight: 100;
+  font-size: .7em;
+}
+
+.gt-track__pos:nth-child(n+4) {
+  color: #ff6600;
+}
+
+.gt-tracklist__artwork {
+  margin-top: 1.55em;
+  position: fixed;
+}

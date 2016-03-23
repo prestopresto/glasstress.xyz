@@ -47,7 +47,7 @@ var spotLight;
 var light;
 var object3d;
 var lastSegment = { start:0 };
-var { audio, analyser, source } = fft()
+var { audio, analyser, source, biquadFilter } = fft()
 var cameraZ = 0
 var sunlight;
 var camControls;
@@ -64,9 +64,11 @@ var tethraGeometry = new THREE.TetrahedronGeometry(1120, 4);
 const objects = []
 var bufferLength = analyser.frequencyBinCount;
 var frequencyData = new Uint8Array(bufferLength)
+var amplitudeData = new Uint8Array(bufferLength)
 var currentBeat;
 var lastBeat = {};
 var spacePressed = false;
+var dotting = false;
 
 import { setupData, audioData, getBeatsByTime, getSegmentsByTime, getBarsByTime, getTatumsByTime, getScenesByTime } from '../lib/audio-data'
 import { TextMesh } from '../objects/Text'
@@ -123,7 +125,7 @@ export function init() {
   scene = new THREE.Scene()
   
   scene.fog = new THREE.Fog( 0x121212, 0.6, 12000 )
-  scene.add( new THREE.AmbientLight( 0xffffff) );
+  scene.add( new THREE.AmbientLight( 0x47E4E0) );
 
 
   // CAMERA
@@ -135,13 +137,15 @@ export function init() {
   camera.lookAt( scene.position );
   
   //camera.rotation.x = -1
-
-  // LIGHTS
-  scene.add(new THREE.AmbientLight( 0xffffff, 0.8 ))
   
-  light = new THREE.DirectionalLight( 0x3FBAC2, 0.1 );
+  light = new THREE.DirectionalLight( 0xF67FF5, 0.8 );
   light.castShadow = true;
-  light.position.set(-800, -1200, 2000)
+  light.position.set(-800, -1200, 1000)
+  scene.add(light)
+
+  light = new THREE.DirectionalLight( 0xB5421E, 0.8 );
+  light.castShadow = true;
+  light.position.set(800, 1200, 1000)
   scene.add(light)
 
   // var light1 = new THREE.DirectionalLight( 0xF64662, 0.1 );
@@ -227,7 +231,7 @@ export function init() {
     //alpha: true
   });
 
-  renderer.setPixelRatio( 1 );
+  renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( screenX, screenY );
   renderer.setClearColor(0x121212);
 
@@ -239,7 +243,7 @@ export function init() {
   // append canvas
   document.getElementById('visualization').appendChild( renderer.domElement );
 
-  composer = new WAGNER.Composer( renderer, { useRGBA: false } );
+  composer = new WAGNER.Composer( renderer, { useRGBA: true } );
   composer.setSize( window.innerWidth, window.innerHeight ); // or whatever resolution
   
   dirtPass = new WAGNER.DirtPass();
@@ -247,6 +251,7 @@ export function init() {
   bloomPass = new WAGNER.MultiPassBloomPass();
   bloomPass.params.blurAmount = 1;
   FXAAPass = new WAGNER.FXAAPass();
+  CGAPass = new WAGNER.CGAPass();
   vignettePass = new WAGNER.Vignette2Pass();
   vignettePass.params.boost = 2;
   vignettePass.params.reduction = 3;
@@ -269,10 +274,12 @@ export function init() {
 
 export function playScene() {
   // PLAY AUDIO
-  audio.play()
+  //
   scene.add(sphereMesh);
   noisePass.params.speed = 1;
   playing = true
+
+  audio.play()
 }
 
 let beats=[]
@@ -367,7 +374,7 @@ function addSegment(segment, radius=10, multiplyScalar=10) {
     const material = new THREE.MeshPhongMaterial({
       color: Math.random()*0xffffff, 
       transparent: true,
-      specular: Math.random() * 0xffffff,
+      //specular: Math.random() * 0xffffff,
       wireframe: !isLoud,
       shading: isLoud ? THREE.FlatShading : THREE.SmoothShading
     })
@@ -524,7 +531,7 @@ var distanceY = 0, velocityY = 0
 //   console.log('z', posZ)
 // })
 
-//audio.currentTime = -60
+audio.currentTime = 0
 function getDistance(time) {
   var t = time/1000
   var distX = 1*(t)+(velocityX*Math.pow(t, 2))/2
@@ -569,6 +576,12 @@ export function animate(time) {
   if(currentSegment) {
     segmentLoudness = ((-100 - currentSegment.loudnessMax) * -1) / 100
 
+    if(segmentLoudness >= 0.95) {
+      dotting = true
+    } else {
+      dotting = false
+    }
+
     if(currentSegment && currentSegment.start != lastSegment.start) {
       noisePass.params.amount = (segmentLoudness/100)*5
       addSegment(currentSegment)
@@ -583,36 +596,52 @@ export function animate(time) {
   }
     
   TWEEN.update()
-  if(playing) analyser.getByteFrequencyData(frequencyData)
+  if(playing) {
+    analyser.getByteFrequencyData(frequencyData)
+    //analyser.getByteTimeDomainData(amplitudeData)
+  }
+
   render()
   requestAnimationFrame(animate)
 }
 
+
+var closk = new THREE.Clock()
+
 export function render() {
 
-  camera.position.x += ( mouseX - camera.position.x ) * 0.05;
-  camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
-  camera.lookAt( scene.position );
+  //camera.position.y +=(Math.cos(audio.currentTime))*10//( mouseX ) * 0.005;
+  //camera.rotation.y += (Math.sin(audio.currentTime))/100
+  
+  //camera.lookAt( scene.position );
 
+  particles.update(frequencyData, audio.currentTime)
   renderer.autoClearColor = true;
-  particles.update(frequencyData)
+  
   composer.reset();
   composer.render( scene, camera );
+  
   // composer.pass( dirtPass );
   composer.pass( chromaticAbberationPass );
 
-  if(spacePressed) {
-    //composer.pass(dotScreenPass)
-    composer.pass( bloomPass );
-  }
   //composer.pass( bloomPass );
+  composer.pass( noisePass );
   composer.pass( vignettePass );
   composer.pass( FXAAPass );
-  composer.pass( noisePass );
+  
   
   if(spacePressed) {
     composer.pass(dotScreenPass)
+    composer.pass( bloomPass );
   }
+
+  bloomPass.params.blurAmount = 1.0
+
+  if(dotting) {
+    bloomPass.params.blurAmount = 10.0
+    composer.pass( bloomPass );
+  }
+
   //composer.pass( oldVideoPass );
   composer.toScreen();
 }

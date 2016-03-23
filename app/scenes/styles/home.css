@@ -1,200 +1,98 @@
+/* VISUALIZATION */
+.gt-viz {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
 
-.gt-screen--home {
+
+/* SCREEN */
+.gt-screen {
+  display: flex;
+  position: absolute;
   width: 100%;
   height: 100%;
   height: 100vh;
-  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  /*background: rgba(255, 255, 255, .12);*/
-  position: relative;
-  z-index: 1;
-  position: absolute;
+  justify-content: center;
 }
 
-#visualization {
-  background: #000;
-}
-
-#visualization canvas {
-  position: fixed;
-  /*top: 100px;*/
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-
+/* NAVIGATION */
 .gt-screen__icosahedron {
   position: fixed;
-  top: 0;
-  right: 0;
+  right: 1em;
+  top: 1em;
   z-index: 9999;
 }
 
-@media screen and (min-width: 768px) {
-  .gt-screen__icosahedron {
-    top: 2em;
-    right: 2em;
-  }
-}
-
-.gt-screen__title {
-  margin-top: auto;
-  text-align: center;
-}
-
-.gt-title {
-  font-size: 1.25em;
-  text-transform: uppercase;
-  font-weight: 600;
-  margin: 0;
-  letter-spacing: 0em;
-  margin-top: auto;
-}
-
-.gt-title span span {
-  /*border-bottom: 2px solid #fff;*/
-  display: inline-block;
-  min-width: 20px;
-  text-align: center;
-  font-size: 1em;
-}
-
-.gt-screen__action {
-  margin-top: 2em;
-  margin-bottom: 10em;
-  text-align: center;
-}
-
-.gt-screen__footer {
-  
-}
-
-.gt-button:focus {
-  outline: none;
-}
-
-.gt-button--launch {
-  color: #fff;
-  text-decoration: none;
-  background: transparent;
-  border-top: 1px solid rgba(255, 255, 255, 0);
-  border-left: 1px solid rgba(255, 255, 255, 0);
-  border-right: 1px solid rgba(255, 255, 255, 0);
-  border-bottom: 1px solid rgba(255, 255, 255, 0);
-  display: inline-block;
-  padding: 1.5em 2.5em;
-  border-radius: 0;
-  text-transform: uppercase;
-  font-size: .75em;
-  /*letter-spacing: .15em;*/
-  min-width: 100px;
-  text-align: center;
-  /*transition: all .8s ease-out;*/
-}
-
-/*.gt-button--launch:hover {
-  border-top: 1px solid rgba(255, 255, 255, .25);
-  border-left: 1px solid rgba(255, 255, 255, .25);
-  border-right: 1px solid rgba(255, 255, 255, .25);
-  border-bottom: 1px solid rgba(255, 255, 255, .25);
-  border-radius: 25px;
-  letter-spacing: .275em;
-}*/
-
-.gt-screen--project {
-  min-height: 100vh;
-  position: relative;
-  z-index: 10;
-  background: rgba(255, 255, 255, .12);
-  display: flex;
-}
-
-.gt-screen__left,
-.gt-screen__right {
-  flex: 2;
-}
-
-.gt-screen__right {
-  flex: 3;
-}
-
-.gt-screen__left-title {
-  padding: 2em 1em;
-  font-weight: 100;
-  font-size: 4em;
-}
-
-.gt-screen__right {
-  /*background: #fff;*/
-}
-
-h1,
-h2,
-h3 {
-  margin: 0;
-}
-
-h2 {
-  font-weight: 100;
-  text-transform: uppercase;
-  font-size: .75em;
-}
-
-h2 span span {
-  width: 12px;
-  display: inline-block;
-  text-align: center;
-  font-weight: 800;
-  color: #777;
-}
-
-.gt-text--secondary {
-  font-size: .9em;
-}
-
-.gt-text--small {
-  font-size: .85em;
-  opacity: .75;
-  font-weight: 100;
-}
-
-.gt-text--body {
-  padding: 4em 6em 4em;
-  line-height: 1.5;
-  font-size: 1.5em;
-  font-weight: 100;
-  color: rgba(255, 255, 255, .9);
-  -webkit-font-smoothing: antialiased;
-}
-
-.gt-screen__toolbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  padding: 2em;
-  text-align: right;
-}
-
+/* NOW PLAYING */
 .gt-screen__nowplaying {
   position: fixed;
-  top: 2em;
   left: 2em;
-  z-index: 10;
-}
-
-.gt-screen__nowplaying-label {
-  opacity: .5;
+  bottom: 2em;
 }
 
 .gt-screen__nowplaying-title {
-  line-height: 1;
   margin: 0;
   padding: 0;
-  font-weight: 100;
   font-size: 1.5em;
+  margin-top: -.25em;
+  font-weight: 100;
+  text-transform: lowercase;
+  position: relative;
+  left: -1px;
+}
+
+.gt-gt--nowplaying {
+  position: absolute;
+  left: -1em;
+  top: -1em;
+  font-size: .5em;
+}
+
+/* HERO */
+.gt-screen__title {
+  text-align: center;
+  margin: 0 auto;
+  /*display: flex;*/
+  align-items: flex-start;
+  justify-content: center;
+  background: rgba(255, 240, 245, .95);
+  color: #444;
+  padding: 4em;
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, .25);
+  box-shadow: 0 0 32px rgba(255, 255, 255, 1);
+  border-radius: 50%;
+}
+
+.gt-title,
+.gt-subtitle {
+  margin: 0;
+  line-height: 1;
+  /**/
+}
+
+.gt-title {
+  font-size: 1.75em;
+  text-align: center;
+}
+
+.gt-title .gt-typewriter span {
+  width: 1.25em;
+}
+
+.gt-subtitle {
+  font-weight: 100;
+  font-size: .7em;
+  margin-top: 1em;
+}
+
+.gt-button--launch {
+  background: transparent;
+  margin-top: 2em;
+  border: transparent;
 }
