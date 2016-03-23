@@ -411,7 +411,7 @@ function tweenSegment(m, loudness, duration, delay=1, remove=true) {
       m.scale.set(this.scale, this.scale, this.scale)
     })
     .onComplete(function() {
-      tweenSegmentOut(m, 2000, loudness*1000, true)
+      tweenSegmentOut(m, 2000, loudness*2000, true)
     })
     .start()
     
