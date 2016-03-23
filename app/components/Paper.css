@@ -2,7 +2,7 @@
   position: relative;
   z-index: 1000;
   /*background: rgba(0, 0, 0, .65);*/
-  background: rgba(255, 255, 255, .9);
+  background: rgba(255, 255, 255, .92);
   color: #444;
 }
 
@@ -17,7 +17,7 @@
 
 @media screen and (min-width: 769px) {
   .gt-paper-grid {
-    display: flex;
+    /*display: flex;*/
   } 
 }
 
@@ -27,17 +27,16 @@
   line-height: 1;
   -webkit-font-smoothing: antialiased;
   cursor: pointer;
-  letter-spacing: -.1em;
   margin-bottom: .25em;
 }
 
 .gt-paper__content {
   max-width: 720px;
-  padding-right: 8em;
+  margin: 0 auto;
 }
 
 .gt-paper__aside {
-  padding: 2em;
+  /*padding: 2em;*/
 }
 .gt-paper__content,
 .gt-paper__aside {

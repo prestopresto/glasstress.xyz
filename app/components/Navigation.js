@@ -7,12 +7,14 @@ import TypeWriter from '../components/TypeWriter'
 const items = [
   {
     title: "The Project",
+    navTitle: "The Project",
     subtitle: "00>About",
     href: "project",
     id: 0,
   },
   {
     title: "Tracklist",
+    navTitle: "Tracklist",
     subtitle: "01>Listen",
     href: "tracklist",
     id: 2,
@@ -23,11 +25,14 @@ const items = [
   },
   {
     title: "Masterpieces",
+    navTitle: "Masterpieces",
     subtitle: "02>See",
     href: "masterpieces",
     id: 3
   },
 ]
+
+require('./Navigation.css')
 
 export default class Navigation extends Component {
 
@@ -72,9 +77,9 @@ export default class Navigation extends Component {
             onMouseOver={this.mouseOverButton}
             onMouseOut={this.mouseOutButton} 
             onClick={this.toggle} />
-          {mouseOver && <span className="gt-text--subhead">
-            {show ? <TypeWriter word="close" /> : <TypeWriter word="menu" />}
-          </span>}
+          <span className="gt-text--subhead">
+            <TypeWriter word={show ? "close" : "menu"} />
+          </span>
         </div>
 
         <Motion 
@@ -130,14 +135,17 @@ export default class Navigation extends Component {
                   {interpolatingStyles =>
                     <div>
                       {interpolatingStyles.map((style, i) =>
-                        <div key={i} style={{
-                          paddingTop: 8,
-                          paddingBottom: 8,
-                          fontSize: '1.75em', 
-                          fontWeight: 100,
-                          opacity: style.opacity,
-                          transform: `translate3d(0, ${style.y}px, 0)`
-                        }}>
+                        <div key={i} 
+                          className="gt-navigation__item"
+                          style={{
+                            paddingTop: 8,
+                            paddingBottom: 8,
+                            fontSize: '1.5em', 
+                            fontWeight: 100,
+                            opacity: style.opacity,
+                            textTransform: 'lowercase',
+                            transform: `translate3d(0, ${style.y}px, 0)`
+                          }}>
                           <a 
                             onClick={this.navigate.bind(this, items[i])}
                             href={"#" + items[i].href}

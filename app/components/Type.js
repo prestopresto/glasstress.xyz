@@ -55,7 +55,7 @@ export default class Type extends Component {
         this.setState({ 
           char, 
           opacity: 0 + ((1.0 / maxIterations) * iterations),
-          scale: 0 + ((1.0 / maxIterations) * iterations),
+          scale: .3 + ((0.7 / maxIterations) * iterations),
         })
         this.iterations += 1
         this.typer()

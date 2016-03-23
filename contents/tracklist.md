@@ -2,7 +2,7 @@
 <div class="gt-tracklist">
   <div class="gt-track gt-track--tracklist">
     <div class="gt-track__pos">
-      01>
+      01<sub>></sub>
     </div>
     <div class="gt-track__track">
       Glasstress
@@ -14,7 +14,7 @@
 
   <div class="gt-track gt-track--tracklist">
     <div class="gt-track__pos">
-      02>
+      02<sub>></sub>
     </div>
     <div class="gt-track__track">
       Like A Glass Angel
@@ -26,7 +26,7 @@
 
   <div class="gt-track gt-track--tracklist">
     <div class="gt-track__pos">
-      03>
+      03<sub>></sub>
     </div>
     <div class="gt-track__track">
       Vetrosequenza
@@ -38,7 +38,7 @@
 
   <div class="gt-track gt-track--tracklist">
     <div class="gt-track__pos">
-      04>
+      04<sub>></sub>
     </div>
     <div class="gt-track__track">
       Jingling Flames
@@ -50,7 +50,7 @@
 
   <div class="gt-track gt-track--tracklist">
     <div class="gt-track__pos">
-      05>
+      05<sub>></sub>
     </div>
     <div class="gt-track__track">
       Glasscape Grinder
@@ -62,7 +62,7 @@
 
   <div class="gt-track gt-track--tracklist">
     <div class="gt-track__pos">
-      06>
+      06<sub>></sub>
     </div>
     <div class="gt-track__track">
       The Wood
@@ -74,7 +74,7 @@
 
   <div class="gt-track gt-track--tracklist">
     <div class="gt-track__pos">
-      07>
+      07<sub>></sub>
     </div>
     <div class="gt-track__track">
       Murano Notte
@@ -86,7 +86,7 @@
 
   <div class="gt-track gt-track--tracklist">
     <div class="gt-track__pos">
-      08>
+      08<sub>></sub>
     </div>
     <div class="gt-track__track">
       Glassroom

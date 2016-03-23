@@ -63,10 +63,7 @@ export default class Paper extends Component {
 
         <div className="gt-paper-grid">
 
-
-          <div className="gt-paper__aside">
-            {this.props.section.aside && this.props.section.aside}
-          </div>
+          {this.props.section.aside && this.props.section.aside}
 
           <div className="gt-paper__content">
             <div className="gt-paper__back" onClick={this.props.onClose}>

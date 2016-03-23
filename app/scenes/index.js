@@ -212,6 +212,7 @@ export default class Scene extends Component {
           appear={{
             scale: 1,
             opacity: 0,
+            translateY: -60
           }}
           enter={{
             opacity: spring(1, {stiffness:5, damping:10}),
@@ -220,10 +221,10 @@ export default class Scene extends Component {
           }}
           leave={{
             opacity: spring(0, {stiffness:20, damping:10}),
-            translateY: 0,
+            translateY: spring(400),
             scale: spring(0, {stiffness:20, damping:10})
           }}>
-        {!this.state.launched && <div key="title" className="gt-screen__title">
+        {!this.state.launched && pageIdx<0 && <div key="title" className="gt-screen__title">
             <h1 className="gt-title">
               <TypeWriter word="glass" />
             </h1>

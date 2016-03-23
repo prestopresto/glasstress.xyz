@@ -5,7 +5,6 @@ require('./TypeWriter.css')
 
 export default class TypeWriter extends Component {
   constructor(props) {
-    // code
     super(props)
   }
 
@@ -14,7 +13,6 @@ export default class TypeWriter extends Component {
     const { word, totalTime } = this.props
     const chars = word.split('')
 
-
     return (
       <span className="gt-typewriter" ref={(ref) => {
         this.ref = ref
@@ -22,11 +20,11 @@ export default class TypeWriter extends Component {
         {
           chars.map((char, i) =>
             <Type 
-              minDelay={(i*1)+1} 
-              maxDelay={(i*1)+100} 
-              iterations={4}
+              minDelay={(i*1)*1} 
+              maxDelay={(i*1)*50} 
+              iterations={12}
               char={char} 
-              key={i} />
+              key={i+char} />
           )
         }
       </span>)
