@@ -59281,12 +59281,13 @@
 	    _mesh.rotation.set(Math.random() * 1, Math.random() * 1, Math.random() * 1);
 	    _mesh.position.set(Math.random() * 1.0 - 0.5, Math.random() * 1.0 - 0.5, 0);
 	    _mesh.scale.set(1, 1, 1);
-	    _mesh.position.multiplyScalar(loudnessMax * 1750);
+	    _mesh.position.multiplyScalar(loudnessMax * 1250);
 	    _mesh.castShadow = true;
 	    _mesh.receiveShadow = false;
 
 	    object3d.add(_mesh);
 	    tweenSegment(_mesh, loudnessMax, segment.duration, i * (segment.duration / segmentLength) * 1000);
+	    tweenSegmentOut(_mesh, 4000, loudnessMax * 500, true);
 	  }
 	}
 
@@ -59300,9 +59301,7 @@
 
 	  var tween = new _tween2.default.Tween({ scale: 0 }).delay(delay).to({ scale: scale }, duration * 1000).easing(_tween2.default.Easing.Elastic.Out).onUpdate(function (t) {
 	    m.scale.set(this.scale, this.scale, this.scale);
-	  }).onComplete(function () {
-	    tweenSegmentOut(m, 2000, loudness * 500, true);
-	  }).start();
+	  }).onComplete(function () {}).start();
 
 	  // var tween = new TWEEN
 	  //   .Tween({ scale: scale*10, x: m.position.x, y: m.position.y, z: m.position.z })
@@ -59321,13 +59320,17 @@
 	  var remove = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
 
 	  var position = mesh.position.clone();
-	  var newPosition = position.multiplyScalar(scalarValue);
+	  var newPosition = position.multiplyScalar(10);
+	  console.log('position', position.x);
+	  console.log('newPosition', newPosition.x);
 	  newPosition.z = Math.random() * 10;
 
-	  var tween = new _tween2.default.Tween(mesh.position).to({ x: newPosition.x, y: newPosition.y, z: newPosition.z }, duration).easing(_tween2.default.Easing.Quadratic.InOut).onUpdate(function (t) {
+	  var tween = new _tween2.default.Tween(mesh.position).delay(100).to({ x: newPosition.x, y: newPosition.y, z: newPosition.z }, duration).easing(_tween2.default.Easing.Quadratic.Out).onUpdate(function (t) {
 	    mesh.material.opacity = 1 - t;
-	    mesh.position.set(this.x, this.y, this.z);
-	    mesh.rotation.set(t, t, t);
+	    //mesh.position.set(this.x, this.y, this.z)
+	    mesh.position.y += Math.sin(t * 10) * 300;
+	    mesh.position.x = this.x;
+	    //mesh.rotation.set(t, t, t)
 	    //mesh.scale.set(this.scale, this.scale, this.scale)
 	    //mesh.material.uniforms.displacement.value = Math.random() * 10
 	  }).onComplete(function () {
