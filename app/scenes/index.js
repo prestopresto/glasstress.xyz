@@ -247,9 +247,7 @@ export default class Scene extends Component {
           }}>
         {!this.state.launched && pageIdx<0 && <div key="title" className="gt-screen__title">
             <h1 className="gt-title">
-              <TypeWriter word="glass" />
-            </h1>
-            <h1 className="gt-title">
+              <TypeWriter word="glass" /><br/>
               <TypeWriter word="tress" />
             </h1>
             <h2 className="gt-subtitle">

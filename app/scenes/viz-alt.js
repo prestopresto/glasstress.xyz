@@ -265,6 +265,7 @@ export function init() {
   oldVideoPass = new WAGNER.OldVideoPass()
   dotScreenPass = new WAGNER.DotScreenPass()
   halftoneCMYKPass = new WAGNER.HalftoneCMYKPass()
+  barrelBlurPass = new WAGNER.PoissonDiscBlurPass()
 
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
   document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -403,11 +404,11 @@ function addSegment(segment, radius=10, multiplyScalar=10) {
 
     _mesh.rotation.set(Math.random() * 1, Math.random() * 1, Math.random() * 1)
     _mesh.position.set(
-      Math.random() * 2.0 - 1.0,
-      Math.random() * 2.0 - 1.0,
-      Math.random() * 2.0 - 1.0)
-    _mesh.scale.set(1,1,0)
-    _mesh.position.multiplyScalar(Math.random() * 500)
+      Math.random() * 1.0 - 0.5,
+      Math.random() * 1.0 - 0.5,
+      0)
+    _mesh.scale.set(1,1,1)
+    _mesh.position.multiplyScalar(loudnessMax * 1750)
     _mesh.castShadow = true
     _mesh.receiveShadow = false
   
@@ -552,7 +553,7 @@ var distanceY = 0, velocityY = 0
 //   console.log('z', posZ)
 // })
 
-audio.currentTime = 60
+//audio.currentTime = 60
 function getDistance(time) {
   var t = time/1000
   var distX = 1*(t)+(velocityX*Math.pow(t, 2))/2
@@ -565,7 +566,7 @@ var beatsCount = 0
 
 export function animate(time) {
   barDuration = 1 / (audioData.info.bpm / 60)
-  object3d.rotation.y += 0.01
+  //object3d.rotation.y += 0.01
   textObject.position.y -= 4
   particleSystem.rotation.y -= 0.001
   sphereMesh.rotation.x += 0.01
@@ -660,19 +661,19 @@ export function render() {
   //composer.pass( vignettePass );
   composer.pass( FXAAPass );
   composer.pass( noisePass );
-  
-  
-  
+  composer.pass( vignettePass )
   
   if(spacePressed) {
-    composer.pass(dotScreenPass)
+    composer.pass( dotScreenPass)
     composer.pass( bloomPass );
+    //composer.pass( barrelBlurPass )
   }
+
 
   bloomPass.params.blurAmount = 1.0
 
   if(dotting) {
-    bloomPass.params.blurAmount = 10.0
+    bloomPass.params.blurAmount = 5.0
     composer.pass( bloomPass );
   }
 

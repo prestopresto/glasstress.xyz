@@ -58,10 +58,22 @@ h3 {
   text-transform: lowercase;
 }
 
+.gt-title--light {
+  font-weight: 200;
+}
 .gt-text--subhead {
   font-size: .65em;
   letter-spacing: .1em;
   /*border-bottom: 2px solid;*/
   text-transform: uppercase;
   font-weight: 900;
+}
+
+.gt-text--small {
+  font-size: .85em;
+}
+
+.gt-text--secondary {
+  opacity: .5;
+  line-height: 1;
 }

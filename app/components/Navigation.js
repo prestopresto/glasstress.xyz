@@ -23,13 +23,6 @@ const items = [
         <img src="/assets/imgs/glasstress-front.jpg" width={500} height={500} />
       </div>)
   },
-  {
-    title: "Masterpieces",
-    navTitle: "Masterpieces",
-    subtitle: "02>See",
-    href: "masterpieces",
-    id: 3
-  },
 ]
 
 require('./Navigation.css')
@@ -66,10 +59,11 @@ export default class Navigation extends Component {
 
   render() {
     
-    const { show, mouseOver } = this.state
+    let { show, mouseOver } = this.state
     const springParams = {stiffness: 280, damping: 20}
     const springParamsAlt = {stiffness: 200, damping: 30}
 
+    //show=true
     return (
       <div>
         <div style={{textAlign:'center',cursor:'pointer'}} onClick={this.toggle}>
@@ -94,35 +88,18 @@ export default class Navigation extends Component {
           {values => 
             <div 
               {...this.props}
+              className="gt-navigation__content"
               style={{
                 //transform: `translate3d(0, ${values.y}%, 0)`,
                 //background: 'rgba(0,0,0,.45)',
-                background: 'linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, .9))',
                 opacity: values.opacity,
-                position: 'fixed',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                textAlign: 'right',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                color: '#ababab',
-                pointerEvents: show ? 'inherit' : 'none',
-                zIndex: -1
-              }}>
-              
-              <div style={{
-                flex:1,
-                paddingRight: '2em'
+                pointerEvents: show ? 'inherit' : 'none'
               }}>
 
                 {show && <StaggeredMotion
                   defaultStyles={[
                     {y: -30, opacity: 0}, 
                     {y: -40, opacity: 0}, 
-                    {y: -50, opacity: 0},
                     ]}
                   styles={prevInterpolatedStyles => prevInterpolatedStyles.map((_, i) => {
                     return i === 0
@@ -133,7 +110,7 @@ export default class Navigation extends Component {
                         }
                   })}>
                   {interpolatingStyles =>
-                    <div>
+                    <div style={{height:200,marginTop:'auto'}}>
                       {interpolatingStyles.map((style, i) =>
                         <div key={i} 
                           className="gt-navigation__item"
@@ -155,8 +132,23 @@ export default class Navigation extends Component {
                     </div>
                   }
                 </StaggeredMotion>}
+                <div className="gt-navigation__info">
+                  <span className="gt-text">
+                    get the full album <a target="_blank" href="http://glasstress.lnk.to/CasacciMana">here</a><br/>
+                  </span>
+                  <span className="gt-text--small gt-text--secondary">available for spotify, itunes, apple music, deezer, google play, amazon mp3</span>
+                </div>
+                <div className="gt-navigation__credits">
+                  <span className="gt-text">
+                    <a target="_blank" href="http://badpandarecords.bandcamp.com/">
+                      <img src="/assets/imgs/badpanda-logo.jpg" width={32} style={{verticalAlign:'middle',borderRadius:'50%',marginBottom:'1em'}}/>
+                    </a>
+                    <br/>
+                    Album released and distributed by <a target="_blank" href="http://badpandarecords.bandcamp.com/">Bad Panda Records</a> <sub>&gt;</sub> website+3d: <a href="http://prestopresto.co">presto</a>
+                    <br/>&copy; 2016 all rights reverved
+                  </span>
+                </div>
               </div>
-            </div>
           }
         </Motion>
       </div>

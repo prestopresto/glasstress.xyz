@@ -57324,12 +57324,6 @@
 	    { className: 'gt-tracklist__artwork' },
 	    _react2.default.createElement('img', { src: '/assets/imgs/glasstress-front.jpg', width: 500, height: 500 })
 	  )
-	}, {
-	  title: "Masterpieces",
-	  navTitle: "Masterpieces",
-	  subtitle: "02>See",
-	  href: "masterpieces",
-	  id: 3
 	}];
 
 	__webpack_require__(315);
@@ -57382,6 +57376,7 @@
 	      var springParams = { stiffness: 280, damping: 20 };
 	      var springParamsAlt = { stiffness: 200, damping: 30 };
 
+	      //show=true
 	      return _react2.default.createElement(
 	        'div',
 	        null,
@@ -57409,72 +57404,108 @@
 	            return _react2.default.createElement(
 	              'div',
 	              _extends({}, _this2.props, {
+	                className: 'gt-navigation__content',
 	                style: {
 	                  //transform: `translate3d(0, ${values.y}%, 0)`,
 	                  //background: 'rgba(0,0,0,.45)',
-	                  background: 'linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, .9))',
 	                  opacity: values.opacity,
-	                  position: 'fixed',
-	                  display: 'flex',
-	                  alignItems: 'center',
-	                  justifyContent: 'flex-end',
-	                  textAlign: 'right',
-	                  top: 0,
-	                  left: 0,
-	                  width: '100%',
-	                  height: '100%',
-	                  color: '#ababab',
-	                  pointerEvents: show ? 'inherit' : 'none',
-	                  zIndex: -1
+	                  pointerEvents: show ? 'inherit' : 'none'
 	                } }),
+	              show && _react2.default.createElement(
+	                _reactMotion.StaggeredMotion,
+	                {
+	                  defaultStyles: [{ y: -30, opacity: 0 }, { y: -40, opacity: 0 }],
+	                  styles: function styles(prevInterpolatedStyles) {
+	                    return prevInterpolatedStyles.map(function (_, i) {
+	                      return i === 0 ? { y: (0, _reactMotion.spring)(40, springParams), opacity: (0, _reactMotion.spring)(1, springParams) } : {
+	                        opacity: (0, _reactMotion.spring)(prevInterpolatedStyles[i - 1].opacity, springParams),
+	                        y: (0, _reactMotion.spring)(prevInterpolatedStyles[i - 1].y, springParams)
+	                      };
+	                    });
+	                  } },
+	                function (interpolatingStyles) {
+	                  return _react2.default.createElement(
+	                    'div',
+	                    { style: { height: 200, marginTop: 'auto' } },
+	                    interpolatingStyles.map(function (style, i) {
+	                      return _react2.default.createElement(
+	                        'div',
+	                        { key: i,
+	                          className: 'gt-navigation__item',
+	                          style: {
+	                            paddingTop: 8,
+	                            paddingBottom: 8,
+	                            fontSize: '1.5em',
+	                            fontWeight: 100,
+	                            opacity: style.opacity,
+	                            textTransform: 'lowercase',
+	                            transform: 'translate3d(0, ' + style.y + 'px, 0)'
+	                          } },
+	                        _react2.default.createElement(
+	                          'a',
+	                          {
+	                            onClick: _this2.navigate.bind(_this2, items[i]),
+	                            href: "#" + items[i].href,
+	                            style: { color: '#fff', fontWeight: 100, textDecoration: 'none' } },
+	                          items[i].title
+	                        )
+	                      );
+	                    })
+	                  );
+	                }
+	              ),
 	              _react2.default.createElement(
 	                'div',
-	                { style: {
-	                    flex: 1,
-	                    paddingRight: '2em'
-	                  } },
-	                show && _react2.default.createElement(
-	                  _reactMotion.StaggeredMotion,
-	                  {
-	                    defaultStyles: [{ y: -30, opacity: 0 }, { y: -40, opacity: 0 }, { y: -50, opacity: 0 }],
-	                    styles: function styles(prevInterpolatedStyles) {
-	                      return prevInterpolatedStyles.map(function (_, i) {
-	                        return i === 0 ? { y: (0, _reactMotion.spring)(40, springParams), opacity: (0, _reactMotion.spring)(1, springParams) } : {
-	                          opacity: (0, _reactMotion.spring)(prevInterpolatedStyles[i - 1].opacity, springParams),
-	                          y: (0, _reactMotion.spring)(prevInterpolatedStyles[i - 1].y, springParams)
-	                        };
-	                      });
-	                    } },
-	                  function (interpolatingStyles) {
-	                    return _react2.default.createElement(
-	                      'div',
-	                      null,
-	                      interpolatingStyles.map(function (style, i) {
-	                        return _react2.default.createElement(
-	                          'div',
-	                          { key: i,
-	                            className: 'gt-navigation__item',
-	                            style: {
-	                              paddingTop: 8,
-	                              paddingBottom: 8,
-	                              fontSize: '1.5em',
-	                              fontWeight: 100,
-	                              opacity: style.opacity,
-	                              textTransform: 'lowercase',
-	                              transform: 'translate3d(0, ' + style.y + 'px, 0)'
-	                            } },
-	                          _react2.default.createElement(
-	                            'a',
-	                            {
-	                              onClick: _this2.navigate.bind(_this2, items[i]),
-	                              href: "#" + items[i].href,
-	                              style: { color: '#fff', fontWeight: 100, textDecoration: 'none' } },
-	                            items[i].title
-	                          )
-	                        );
-	                      })
-	                    );
-	                  }
+	                { className: 'gt-navigation__info' },
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: 'gt-text' },
+	                  'get the full album ',
+	                  _react2.default.createElement(
+	                    'a',
+	                    { target: '_blank', href: 'http://glasstress.lnk.to/CasacciMana' },
+	                    'here'
+	                  ),
+	                  _react2.default.createElement('br', null)
+	                ),
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: 'gt-text--small gt-text--secondary' },
+	                  'available for spotify, itunes, apple music, deezer, google play, amazon mp3'
+	                )
+	              ),
+	              _react2.default.createElement(
+	                'div',
+	                { className: 'gt-navigation__credits' },
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: 'gt-text' },
+	                  _react2.default.createElement(
+	                    'a',
+	                    { target: '_blank', href: 'http://badpandarecords.bandcamp.com/' },
+	                    _react2.default.createElement('img', { src: '/assets/imgs/badpanda-logo.jpg', width: 32, style: { verticalAlign: 'middle', borderRadius: '50%', marginBottom: '1em' } })
+	                  ),
+	                  _react2.default.createElement('br', null),
+	                  'Album released and distributed by ',
+	                  _react2.default.createElement(
+	                    'a',
+	                    { target: '_blank', href: 'http://badpandarecords.bandcamp.com/' },
+	                    'Bad Panda Records'
+	                  ),
+	                  ' ',
+	                  _react2.default.createElement(
+	                    'sub',
+	                    null,
+	                    '>'
+	                  ),
+	                  ' website+3d: ',
+	                  _react2.default.createElement(
+	                    'a',
+	                    { href: 'http://prestopresto.co' },
+	                    'presto'
+	                  ),
+	                  _react2.default.createElement('br', null),
+	                  '© 2016 all rights reverved'
 	                )
 	              )
 	            );
@@ -58728,11 +58759,8 @@
 	              _react2.default.createElement(
 	                'h1',
 	                { className: 'gt-title' },
-	                _react2.default.createElement(_TypeWriter2.default, { word: 'glass' })
-	              ),
-	              _react2.default.createElement(
-	                'h1',
-	                { className: 'gt-title' },
+	                _react2.default.createElement(_TypeWriter2.default, { word: 'glass' }),
+	                _react2.default.createElement('br', null),
 	                _react2.default.createElement(_TypeWriter2.default, { word: 'tress' })
 	              ),
 	              _react2.default.createElement(
@@ -59123,6 +59151,7 @@
 	  oldVideoPass = new WAGNER.OldVideoPass();
 	  dotScreenPass = new WAGNER.DotScreenPass();
 	  halftoneCMYKPass = new WAGNER.HalftoneCMYKPass();
+	  barrelBlurPass = new WAGNER.PoissonDiscBlurPass();
 
 	  document.addEventListener('mousemove', onDocumentMouseMove, false);
 	  document.addEventListener('touchstart', onDocumentTouchStart, false);
@@ -59250,9 +59279,9 @@
 	    var _mesh = new _three2.default.Mesh(geometry, material);
 
 	    _mesh.rotation.set(Math.random() * 1, Math.random() * 1, Math.random() * 1);
-	    _mesh.position.set(Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0, Math.random() * 2.0 - 1.0);
-	    _mesh.scale.set(1, 1, 0);
-	    _mesh.position.multiplyScalar(Math.random() * 500);
+	    _mesh.position.set(Math.random() * 1.0 - 0.5, Math.random() * 1.0 - 0.5, 0);
+	    _mesh.scale.set(1, 1, 1);
+	    _mesh.position.multiplyScalar(loudnessMax * 1750);
 	    _mesh.castShadow = true;
 	    _mesh.receiveShadow = false;
 
@@ -59386,7 +59415,7 @@
 	//   console.log('z', posZ)
 	// })
 
-	audio.currentTime = 60;
+	//audio.currentTime = 60
 	function getDistance(time) {
 	  var t = time / 1000;
 	  var distX = 1 * t + velocityX * Math.pow(t, 2) / 2;
@@ -59399,7 +59428,7 @@
 
 	function animate(time) {
 	  barDuration = 1 / (_audioData.audioData.info.bpm / 60);
-	  object3d.rotation.y += 0.01;
+	  //object3d.rotation.y += 0.01
 	  textObject.position.y -= 4;
 	  particleSystem.rotation.y -= 0.001;
 	  sphereMesh.rotation.x += 0.01;
@@ -59486,16 +59515,18 @@
 	  //composer.pass( vignettePass );
 	  composer.pass(FXAAPass);
 	  composer.pass(noisePass);
+	  composer.pass(vignettePass);
 
 	  if (spacePressed) {
 	    composer.pass(dotScreenPass);
 	    composer.pass(bloomPass);
+	    //composer.pass( barrelBlurPass )
 	  }
 
 	  bloomPass.params.blurAmount = 1.0;
 
 	  if (dotting) {
-	    bloomPass.params.blurAmount = 10.0;
+	    bloomPass.params.blurAmount = 5.0;
 	    composer.pass(bloomPass);
 	  }
 
@@ -63773,7 +63804,7 @@
 
 
 	// module
-	exports.push([module.id, ".gt-navigation__item a {\n  transition: all .25s ease-out;\n  display: block;\n}\n\n.gt-navigation__item a:hover,active {\n  opacity: .6;\n}", ""]);
+	exports.push([module.id, ".gt-navigation__content {\n  background: linear-gradient(to right, rgba(0, 0, 0, .45), rgba(0, 0, 0, .95));\n  position: fixed;\n  display: flex;\n  flex-direction: column;\n  align-items: flex-end;\n  justify-content: center;\n  text-align: right;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  box-sizing: border-box;\n  color: #ababab;\n  z-index: -1;\n  padding-right: 2em;\n}\n\n.gt-navigation__info {\n  max-width: 360px;\n}\n\n.gt-navigation__credits {\n  max-width: 360px;\n  align-self: flex-end;\n  margin-top: auto;\n  margin-bottom: 2em;\n  text-transform: lowercase;\n}\n\n.gt-navigation__credits .gt-text {\n  font-size: 90%;\n}\n\n.gt-navigation__item a {\n  transition: all .25s ease-out;\n  display: block;\n}\n\n.gt-navigation__item a:hover,active {\n  opacity: .6;\n}", ""]);
 
 	// exports
 
@@ -63829,7 +63860,7 @@
 
 
 	// module
-	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 13px;\n}\n\n@media screen and (min-width: 480px) {\n  html,\n  body {\n    font-size: 14px;\n  }\n}\n\n@media screen and (min-width: 768px) {\n  html,\n  body {\n    font-size: 15px;\n  }\n}\n\n@media screen and (min-width: 1280px) {\n  html,\n  body {\n    font-size: 16px;\n  }\n}\n\n\n@media screen and (min-width: 1441px) {\n  html,\n  body {\n    font-size: 20px;\n  }\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}", ""]);
+	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 13px;\n}\n\n@media screen and (min-width: 480px) {\n  html,\n  body {\n    font-size: 14px;\n  }\n}\n\n@media screen and (min-width: 768px) {\n  html,\n  body {\n    font-size: 15px;\n  }\n}\n\n@media screen and (min-width: 1280px) {\n  html,\n  body {\n    font-size: 16px;\n  }\n}\n\n\n@media screen and (min-width: 1441px) {\n  html,\n  body {\n    font-size: 20px;\n  }\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-title--light {\n  font-weight: 200;\n}\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}\n\n.gt-text--small {\n  font-size: .85em;\n}\n\n.gt-text--secondary {\n  opacity: .5;\n  line-height: 1;\n}", ""]);
 
 	// exports
 
