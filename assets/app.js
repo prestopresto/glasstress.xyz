@@ -59405,7 +59405,7 @@
 
 	    console.log('sceneCount', sceneCount);
 
-	    if (sceneCount >= 0 && sceneCount <= 6 && beatsCount % 1 == 0) {
+	    if (sceneCount >= 5 && sceneCount <= 6 && beatsCount % 1 == 0) {
 	      addBeat(currentBeat, beatsCount);
 	    }
 
