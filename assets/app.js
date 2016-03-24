@@ -58674,17 +58674,31 @@
 	            )
 	          ),
 	          _react2.default.createElement(
-	            'div',
-	            { className: 'gt-screen__toolbar' },
-	            _react2.default.createElement(
+	            _reactMotionUiPack2.default,
+	            {
+	              runOnMount: true,
+	              component: false,
+	              enter: {
+	                opacity: 1,
+	                translateY: 0
+	              },
+	              leave: {
+	                opacity: 0,
+	                translateY: 20
+	              } },
+	            this.state.launched && _react2.default.createElement(
 	              'div',
-	              { className: 'gt-screen__mute', onClick: this.changeVolume },
-	              _react2.default.createElement('img', { src: '/assets/imgs/sound-icon.svg', width: 32, style: { transition: 'all .25s ease-out', opacity: this.state.volumeLevel / 100 + 0.1 } }),
-	              _react2.default.createElement('br', null),
+	              { key: 'toolbar', className: 'gt-screen__toolbar' },
 	              _react2.default.createElement(
-	                'span',
-	                { className: 'gt-screen__mute-label' },
-	                _react2.default.createElement(_TypeWriter2.default, { word: 'volume' })
+	                'div',
+	                { className: 'gt-screen__mute', onClick: this.changeVolume },
+	                _react2.default.createElement('img', { src: '/assets/imgs/sound-icon.svg', width: 32, style: { transition: 'all .25s ease-out', opacity: this.state.volumeLevel / 100 + 0.1 } }),
+	                _react2.default.createElement('br', null),
+	                _react2.default.createElement(
+	                  'span',
+	                  { className: 'gt-screen__mute-label' },
+	                  _react2.default.createElement(_TypeWriter2.default, { word: 'volume' })
+	                )
 	              )
 	            )
 	          ),

@@ -203,16 +203,28 @@ export default class Scene extends Component {
         </Transition>
 
         {/* VIZ TOOLBAR */}
-        <div className="gt-screen__toolbar">
-          <div className="gt-screen__mute" onClick={this.changeVolume}>
-            <img src="/assets/imgs/sound-icon.svg" width={32} style={{transition:'all .25s ease-out',opacity:this.state.volumeLevel/100+0.1}} />
-            <br/>
-            <span className="gt-screen__mute-label">
-              <TypeWriter word="volume" />
-            </span>
-            
-          </div>
-        </div>
+        <Transition
+          runOnMount={true}
+          component={false}
+          enter={{
+            opacity: 1,
+            translateY: 0
+          }}
+          leave={{
+            opacity: 0,
+            translateY: 20
+          }}>
+          {this.state.launched && <div key="toolbar" className="gt-screen__toolbar">
+            <div className="gt-screen__mute" onClick={this.changeVolume}>
+              <img src="/assets/imgs/sound-icon.svg" width={32} style={{transition:'all .25s ease-out',opacity:this.state.volumeLevel/100+0.1}} />
+              <br/>
+              <span className="gt-screen__mute-label">
+                <TypeWriter word="volume" />
+              </span>
+              
+            </div>
+          </div>}
+        </Transition>
         
         {/* HERO */}
         <Transition
