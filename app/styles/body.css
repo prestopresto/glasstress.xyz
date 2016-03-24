@@ -11,6 +11,7 @@ body {
   font-size: 13px;
 }
 
+
 @media screen and (min-width: 480px) {
   html,
   body {
@@ -46,10 +47,14 @@ a:link {
   color: #fff;
 }
 
-.serif, .gt-text--serif {
+p, .serif, .gt-text--serif {
   font-family: Lora, serif;
   line-height: 1.5;
   font-weight: 100;
+}
+
+.sans-serif, .gt-text--sans {
+  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;
 }
 
 h1,
