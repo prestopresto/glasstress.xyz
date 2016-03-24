@@ -96,7 +96,7 @@ export default class Navigation extends Component {
                 pointerEvents: show ? 'inherit' : 'none'
               }}>
 
-                {show && <StaggeredMotion
+                <StaggeredMotion
                   defaultStyles={[
                     {y: -30, opacity: 0}, 
                     {y: -40, opacity: 0}, 
@@ -131,20 +131,32 @@ export default class Navigation extends Component {
                       }
                     </div>
                   }
-                </StaggeredMotion>}
-                <div className="gt-navigation__info">
+                </StaggeredMotion>
+                <Transition
+                runOnMount={true}
+                component={false}
+                enter={{
+                  opacity: 1,
+                  translateY: 0
+                }}
+                leave={{
+                  opacity: 0,
+                  translateY: 20
+                }}>
+                {show && <div key="info" className="gt-navigation__info">
                   <span className="gt-text">
                     get the full album <a target="_blank" href="http://glasstress.lnk.to/CasacciMana">here</a><br/>
                   </span>
                   <span className="gt-text--small gt-text--secondary">available for spotify, itunes, apple music, deezer, google play, amazon mp3</span>
-                </div>
+                </div>}
+                </Transition>
                 <div className="gt-navigation__credits">
                   <span className="gt-text">
                     <a target="_blank" href="http://badpandarecords.bandcamp.com/">
                       <img src="/assets/imgs/badpanda-logo.jpg" width={32} style={{verticalAlign:'middle',borderRadius:'50%',marginBottom:'1em'}}/>
                     </a>
                     <br/>
-                    Album released and distributed by <a target="_blank" href="http://badpandarecords.bandcamp.com/">Bad Panda Records</a> <sub>&gt;</sub> website+3d: <a href="http://prestopresto.co">presto</a>
+                    Edited &amp; Distributed by <a target="_blank" href="http://badpandarecords.bandcamp.com/">Bad Panda Records</a> <sub>&gt;</sub> website+3d: <a href="http://prestopresto.co">presto</a>
                     <br/>&copy; 2016 all rights reverved
                   </span>
                 </div>

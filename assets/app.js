@@ -57411,7 +57411,7 @@
 	                  opacity: values.opacity,
 	                  pointerEvents: show ? 'inherit' : 'none'
 	                } }),
-	              show && _react2.default.createElement(
+	              _react2.default.createElement(
 	                _reactMotion.StaggeredMotion,
 	                {
 	                  defaultStyles: [{ y: -30, opacity: 0 }, { y: -40, opacity: 0 }],
@@ -57455,23 +57455,37 @@
 	                }
 	              ),
 	              _react2.default.createElement(
-	                'div',
-	                { className: 'gt-navigation__info' },
-	                _react2.default.createElement(
-	                  'span',
-	                  { className: 'gt-text' },
-	                  'get the full album ',
+	                _reactMotionUiPack2.default,
+	                {
+	                  runOnMount: true,
+	                  component: false,
+	                  enter: {
+	                    opacity: 1,
+	                    translateY: 0
+	                  },
+	                  leave: {
+	                    opacity: 0,
+	                    translateY: 20
+	                  } },
+	                show && _react2.default.createElement(
+	                  'div',
+	                  { key: 'info', className: 'gt-navigation__info' },
 	                  _react2.default.createElement(
-	                    'a',
-	                    { target: '_blank', href: 'http://glasstress.lnk.to/CasacciMana' },
-	                    'here'
+	                    'span',
+	                    { className: 'gt-text' },
+	                    'get the full album ',
+	                    _react2.default.createElement(
+	                      'a',
+	                      { target: '_blank', href: 'http://glasstress.lnk.to/CasacciMana' },
+	                      'here'
+	                    ),
+	                    _react2.default.createElement('br', null)
 	                  ),
-	                  _react2.default.createElement('br', null)
-	                ),
-	                _react2.default.createElement(
-	                  'span',
-	                  { className: 'gt-text--small gt-text--secondary' },
-	                  'available for spotify, itunes, apple music, deezer, google play, amazon mp3'
+	                  _react2.default.createElement(
+	                    'span',
+	                    { className: 'gt-text--small gt-text--secondary' },
+	                    'available for spotify, itunes, apple music, deezer, google play, amazon mp3'
+	                  )
 	                )
 	              ),
 	              _react2.default.createElement(
@@ -57486,7 +57500,7 @@
 	                    _react2.default.createElement('img', { src: '/assets/imgs/badpanda-logo.jpg', width: 32, style: { verticalAlign: 'middle', borderRadius: '50%', marginBottom: '1em' } })
 	                  ),
 	                  _react2.default.createElement('br', null),
-	                  'Album released and distributed by ',
+	                  'Edited & Distributed by ',
 	                  _react2.default.createElement(
 	                    'a',
 	                    { target: '_blank', href: 'http://badpandarecords.bandcamp.com/' },
@@ -58575,8 +58589,12 @@
 	    value: function typewrite() {
 	      var _this2 = this;
 
+	      if (this.state.launched) {
+	        clearTimeout(this.typewriteTimeout);
+	        return;
+	      }
 	      (0, _sfx.playSfx)('sfx08', 0.2);
-	      setTimeout(function () {
+	      this.typewriteTimeout = setTimeout(function () {
 	        _this2.setState({
 	          author: !_this2.state.author
 	        });
@@ -58684,7 +58702,7 @@
 	                opacity: 0,
 	                translateY: 20
 	              } },
-	            this.state.launched && _react2.default.createElement(
+	            this.state.launched && !this.state.showNavigation && _react2.default.createElement(
 	              'div',
 	              { key: 'nowplaying', className: 'gt-screen__nowplaying' },
 	              _react2.default.createElement(
@@ -58717,7 +58735,7 @@
 	                opacity: 0,
 	                translateY: 20
 	              } },
-	            this.state.launched && _react2.default.createElement(
+	            this.state.launched && !this.state.showNavigation && _react2.default.createElement(
 	              'div',
 	              { key: 'toolbar', className: 'gt-screen__toolbar' },
 	              _react2.default.createElement(
@@ -63807,7 +63825,7 @@
 
 
 	// module
-	exports.push([module.id, ".gt-navigation__content {\n  background: linear-gradient(to right, rgba(0, 0, 0, .45), rgba(0, 0, 0, .95));\n  position: fixed;\n  display: flex;\n  flex-direction: column;\n  align-items: flex-end;\n  justify-content: center;\n  text-align: right;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  box-sizing: border-box;\n  color: #ababab;\n  z-index: -1;\n  padding-right: 2em;\n}\n\n.gt-navigation__info {\n  max-width: 360px;\n}\n\n.gt-navigation__credits {\n  max-width: 360px;\n  align-self: flex-end;\n  margin-top: auto;\n  margin-bottom: 2em;\n  text-transform: lowercase;\n}\n\n.gt-navigation__credits .gt-text {\n  font-size: 90%;\n}\n\n.gt-navigation__item a {\n  transition: all .25s ease-out;\n  display: block;\n}\n\n.gt-navigation__item a:hover,active {\n  opacity: .6;\n}", ""]);
+	exports.push([module.id, ".gt-navigation__content {\n  background: linear-gradient(to right, rgba(0, 0, 0, .45), rgba(0, 0, 0, .95));\n  position: fixed;\n  display: flex;\n  flex-direction: column;\n  align-items: flex-end;\n  justify-content: center;\n  text-align: right;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  box-sizing: border-box;\n  color: #ababab;\n  z-index: -1;\n  padding-right: 2em;\n}\n\n.gt-navigation__info {\n  max-width: 420px;\n}\n\n.gt-navigation__credits {\n  max-width: 420px;\n  align-self: flex-end;\n  margin-top: auto;\n  margin-bottom: 2em;\n  text-transform: lowercase;\n}\n\n.gt-navigation__credits .gt-text {\n  font-size: 90%;\n}\n\n.gt-navigation__item a {\n  transition: all .25s ease-out;\n  display: block;\n}\n\n.gt-navigation__item a:hover,active {\n  opacity: .6;\n}", ""]);
 
 	// exports
 

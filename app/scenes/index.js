@@ -90,8 +90,12 @@ export default class Scene extends Component {
 
 
   typewrite() {
+    if(this.state.launched) {
+      clearTimeout(this.typewriteTimeout)
+      return;
+    }
     playSfx('sfx08', 0.2)
-    setTimeout(() => {
+    this.typewriteTimeout = setTimeout(() => {
       this.setState({
         author: !this.state.author
       })
@@ -189,7 +193,7 @@ export default class Scene extends Component {
             opacity: 0,
             translateY: 20
           }}>
-          {this.state.launched && <div key="nowplaying" className="gt-screen__nowplaying">
+          {this.state.launched && !this.state.showNavigation && <div key="nowplaying" className="gt-screen__nowplaying">
             <span className="gt-gt--nowplaying">
               &gt;
             </span>
@@ -214,7 +218,7 @@ export default class Scene extends Component {
             opacity: 0,
             translateY: 20
           }}>
-          {this.state.launched && <div key="toolbar" className="gt-screen__toolbar">
+          {this.state.launched && !this.state.showNavigation && <div key="toolbar" className="gt-screen__toolbar">
             <div className="gt-screen__mute" onClick={this.changeVolume}>
               <img src="/assets/imgs/sound-icon.svg" width={32} style={{transition:'all .25s ease-out',opacity:this.state.volumeLevel/100+0.1}} />
               <br/>
