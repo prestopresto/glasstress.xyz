@@ -59232,10 +59232,10 @@
 	  var loudnessMax = getLoudness(segment.loudnessMax);
 
 	  var isLoud = loudnessMax >= 0.95;
-	  var segmentLength = isLoud ? 3 : 1;
+	  var segmentLength = isLoud ? 4 : 1;
 
 	  for (var i = 0; i < segmentLength; i++) {
-	    var _radius = logScale([0.7, 0.99], [1, 72], loudnessMax);
+	    var _radius = logScale([0.7, 0.99], [1, 64], loudnessMax);
 	    var geometry = new _three2.default.SphereGeometry(_radius, 1, 1); //(radius, 32, 32);
 	    var material = new _three2.default.MeshPhongMaterial({
 	      color: Math.random() * 0xffffff,
@@ -59386,7 +59386,7 @@
 	//   console.log('z', posZ)
 	// })
 
-	//audio.currentTime = 0
+	audio.currentTime = 60;
 	function getDistance(time) {
 	  var t = time / 1000;
 	  var distX = 1 * t + velocityX * Math.pow(t, 2) / 2;

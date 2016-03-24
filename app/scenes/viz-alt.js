@@ -384,10 +384,10 @@ function addSegment(segment, radius=10, multiplyScalar=10) {
   const loudnessMax = getLoudness(segment.loudnessMax)
 
   const isLoud = loudnessMax >= 0.95
-  const segmentLength = isLoud ? 3 : 1
+  const segmentLength = isLoud ? 4 : 1
 
   for(var i = 0; i < segmentLength; i++) {
-    const radius = logScale([0.7, 0.99], [1, 72], loudnessMax)
+    const radius = logScale([0.7, 0.99], [1, 64], loudnessMax)
     const geometry = new THREE.SphereGeometry( radius, 1, 1 )//(radius, 32, 32);
     const material = new THREE.MeshPhongMaterial({
       color: Math.random()*0xffffff, 
@@ -552,7 +552,7 @@ var distanceY = 0, velocityY = 0
 //   console.log('z', posZ)
 // })
 
-//audio.currentTime = 0
+audio.currentTime = 60
 function getDistance(time) {
   var t = time/1000
   var distX = 1*(t)+(velocityX*Math.pow(t, 2))/2
