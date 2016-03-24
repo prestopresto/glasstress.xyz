@@ -57473,7 +57473,7 @@
 	                  _react2.default.createElement(
 	                    'span',
 	                    { className: 'gt-text' },
-	                    'get the full album ',
+	                    'preview, stream or download album ',
 	                    _react2.default.createElement(
 	                      'a',
 	                      { target: '_blank', href: 'http://glasstress.lnk.to/CasacciMana' },
@@ -57500,26 +57500,12 @@
 	                    _react2.default.createElement('img', { src: '/assets/imgs/badpanda-logo.jpg', width: 32, style: { verticalAlign: 'middle', borderRadius: '50%', marginBottom: '1em' } })
 	                  ),
 	                  _react2.default.createElement('br', null),
-	                  'Edited & Distributed by ',
+	                  'Courtesy of ',
 	                  _react2.default.createElement(
 	                    'a',
 	                    { target: '_blank', href: 'http://badpandarecords.bandcamp.com/' },
 	                    'Bad Panda Records'
-	                  ),
-	                  ' ',
-	                  _react2.default.createElement(
-	                    'sub',
-	                    null,
-	                    '>'
-	                  ),
-	                  ' website+3d: ',
-	                  _react2.default.createElement(
-	                    'a',
-	                    { href: 'http://prestopresto.co' },
-	                    'presto'
-	                  ),
-	                  _react2.default.createElement('br', null),
-	                  '© 2016 all rights reverved'
+	                  )
 	                )
 	              )
 	            );
@@ -58319,7 +58305,7 @@
 
 	function setup() {
 	  var particleCount = arguments.length <= 0 || arguments[0] === undefined ? 2048 : arguments[0];
-	  var size = arguments.length <= 1 || arguments[1] === undefined ? 8 : arguments[1];
+	  var size = arguments.length <= 1 || arguments[1] === undefined ? 6 : arguments[1];
 
 	  geometry = new _three2.default.Geometry();
 	  var textureLoader = new _three2.default.TextureLoader();
@@ -58328,7 +58314,7 @@
 	  var material = new _three2.default.PointsMaterial({
 	    size: size,
 	    transparent: true,
-	    opacity: Math.random() + 0.5,
+	    opacity: Math.random() + 0.4,
 	    map: texture,
 	    fog: false,
 	    // alphaTest: true,
@@ -58512,6 +58498,17 @@
 
 	__webpack_require__(318);
 
+	function webglAvailable() {
+	  try {
+	    var canvas = document.createElement("canvas");
+	    return !!window.WebGLRenderingContext && (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
+	  } catch (e) {
+	    return false;
+	  }
+	}
+
+	var isWebglAvailable = webglAvailable();
+
 	var Scene = function (_Component) {
 	  _inherits(Scene, _Component);
 
@@ -58530,12 +58527,20 @@
 	      showLauncher: true,
 	      currentSection: null,
 	      canLaunch: false,
-	      volumeLevel: 90
+	      volumeLevel: 90,
+	      webglAvailable: true
 	    };
 
 	    _this.mouseOver = _this.mouseOver.bind(_this);
 	    _this.mouseOut = _this.mouseOut.bind(_this);
 	    _this.changeVolume = _this.changeVolume.bind(_this);
+
+	    if (!isWebglAvailable) {
+	      var _ret;
+
+	      _this.state.webglAvailable = false, _this.state.canLaunch = true;
+	      return _ret = _this, _possibleConstructorReturn(_this, _ret);
+	    }
 
 	    // load track audio data
 	    fetch('/app/data/track-data2.json').then(function (res) {
@@ -58577,17 +58582,18 @@
 	  }, {
 	    key: 'componentDidUpdate',
 	    value: function componentDidUpdate(prevProps, prevState) {
+	      var _this2 = this;
 
 	      if (this.state.launched && !prevState.launched) {
 	        setTimeout(function () {
-	          visualization.playScene();
+	          visualization.playScene(_this2.state.webglAvailable);
 	        }, 2000);
 	      }
 	    }
 	  }, {
 	    key: 'typewrite',
 	    value: function typewrite() {
-	      var _this2 = this;
+	      var _this3 = this;
 
 	      if (this.state.launched) {
 	        clearTimeout(this.typewriteTimeout);
@@ -58595,10 +58601,10 @@
 	      }
 	      (0, _sfx.playSfx)('sfx08', 0.2);
 	      this.typewriteTimeout = setTimeout(function () {
-	        _this2.setState({
-	          author: !_this2.state.author
+	        _this3.setState({
+	          author: !_this3.state.author
 	        });
-	        _this2.typewrite();
+	        _this3.typewrite();
 	      }, 5000);
 	    }
 	  }, {
@@ -58796,6 +58802,62 @@
 	            )
 	          )
 	        ),
+	        !this.state.webglAvailable && _react2.default.createElement(
+	          'p',
+	          { className: 'gt-webgl-unavailable' },
+	          'Your browser doesn\'t support WebGL!',
+	          _react2.default.createElement('br', null),
+	          'To live the full experience please get a WebGL enabled browser, like Firefox, Chrome or Safari.'
+	        ),
+	        _react2.default.createElement(
+	          _reactMotionUiPack2.default,
+	          {
+	            runOnMount: true,
+	            component: false // don't use a wrapping component
+	            , enter: {
+	              opacity: 1,
+	              translateY: (0, _reactMotion.spring)(0)
+	            },
+	            leave: {
+	              opacity: 0,
+	              translateY: 600
+	            } },
+	          !this.state.launched && !showNavigation && _react2.default.createElement(
+	            'div',
+	            { key: 'footer', className: 'gt-screen__footer' },
+	            _react2.default.createElement(
+	              'p',
+	              { className: 'gt-footer__credits' },
+	              _react2.default.createElement(
+	                'sub',
+	                null,
+	                '>'
+	              ),
+	              _react2.default.createElement('br', null),
+	              'courtesy of ',
+	              _react2.default.createElement(
+	                'strong',
+	                null,
+	                _react2.default.createElement(
+	                  'a',
+	                  { href: 'http://badpandarecords.bandcamp.com', target: '_blank' },
+	                  'bad panda records'
+	                )
+	              ),
+	              _react2.default.createElement('br', null),
+	              'design & 3D ',
+	              _react2.default.createElement(
+	                'strong',
+	                null,
+	                _react2.default.createElement(
+	                  'a',
+	                  { href: 'http://prestopresto.co', target: '_blank' },
+	                  'prestopresto'
+	                )
+	              )
+	            )
+	          )
+	        ),
 	        _react2.default.createElement(
 	          _reactMotionUiPack2.default,
 	          {
@@ -58828,17 +58890,17 @@
 	  }, {
 	    key: 'navigate',
 	    value: function navigate(item) {
-	      var _this3 = this;
+	      var _this4 = this;
 
 	      var pageIdx = item.id;
 	      this.setState({ pageIdx: -1 });
 
 	      setTimeout(function () {
-	        _this3.setState({ showLauncher: false });
+	        _this4.setState({ showLauncher: false });
 	      }, 250);
 
 	      setTimeout(function () {
-	        _this3.setState({ pageIdx: pageIdx, currentSection: item });
+	        _this4.setState({ pageIdx: pageIdx, currentSection: item });
 	      }, 750);
 	    }
 	  }, {
@@ -59186,10 +59248,13 @@
 	}
 
 	function playScene() {
+	  var playVisualization = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
 	  // PLAY AUDIO
-	  //
-	  scene.add(sphereMesh);
-	  noisePass.params.speed = 1;
+	  if (playVisualization) {
+	    scene.add(sphereMesh);
+	    noisePass.params.speed = 1;
+	  }
 	  playing = true;
 	  audio.play();
 	}
@@ -59547,7 +59612,7 @@
 	  bloomPass.params.blurAmount = 1.0;
 
 	  if (dotting) {
-	    bloomPass.params.blurAmount = 5.0;
+	    bloomPass.params.blurAmount = 3.0;
 	    composer.pass(bloomPass);
 	  }
 
@@ -63867,7 +63932,7 @@
 
 
 	// module
-	exports.push([module.id, "/* VISUALIZATION */\n.gt-viz {\n  position: fixed;\n  top: 0;\n  left: 0;\n  height: 100%;\n}\n\n\n/* SCREEN */\n.gt-screen {\n  display: flex;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n}\n\n/* NAVIGATION */\n.gt-screen__icosahedron {\n  position: fixed;\n  right: 2em;\n  top: 2em;\n  z-index: 9999;\n}\n\n/* NOW PLAYING */\n.gt-screen__nowplaying {\n  position: fixed;\n  left: 2em;\n  bottom: 2em;\n}\n\n.gt-screen__nowplaying-title {\n  margin: 0;\n  padding: 0;\n  font-size: 1.5em;\n  margin-top: -.25em;\n  font-weight: 100;\n  text-transform: lowercase;\n  position: relative;\n  left: -1px;\n}\n\n.gt-gt--nowplaying {\n  position: absolute;\n  left: -1em;\n  top: -1em;\n  font-size: .5em;\n}\n\n/* HERO */\n.gt-screen__title {\n  text-align: center;\n  margin: 0 auto;\n  /*display: flex;*/\n  align-items: flex-start;\n  justify-content: center;\n  background: rgba(255, 240, 245, .95);\n  color: #444;\n  padding: 4em;\n  position: relative;\n  z-index: 1000;\n  border: 1px solid rgba(255, 255, 255, .25);\n  /*box-shadow:  \n    16px 0 32px rgba(30, 45, 200, .45),\n    -16px 0 32px rgba(250, 40, 30, .5);*/\n  border-radius: 50%;\n  position: relative;\n}\n/*\n.gt-screen__title:after,\n.gt-screen__title:before {\n  top: 0;\n  left: 0;\n  content:\"\";\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  z-index: -10;\n}\n\n.gt-screen__title:after {\n  left: -1em;\n  background: rgba(30, 45, 200, .45);\n  \n}\n\n.gt-screen__title:before {\n  left: 1em;\n  background: rgba(250, 40, 30, .5);\n}\n*/\n\n.gt-title,\n.gt-subtitle {\n  margin: 0;\n  line-height: 1;\n  /**/\n}\n\n.gt-title {\n  font-size: 1.75em;\n  text-align: center;\n}\n\n.gt-title .gt-typewriter span {\n  width: 1.25em;\n}\n\n.gt-subtitle {\n  font-weight: 100;\n  font-size: .7em;\n  margin-top: 1em;\n}\n\n.gt-button--launch {\n  background: transparent;\n  margin-top: 2em;\n  border: transparent;\n}\n\n/* TOOLBAR */\n.gt-screen__toolbar {\n  position: fixed;\n  right: 2em;\n  bottom: 2em;\n  text-align: center;\n}\n\n.gt-screen__mute {\n  cursor: pointer;\n}\n\n.gt-screen__mute-label {\n  font-size: .5em;\n}", ""]);
+	exports.push([module.id, "/* VISUALIZATION */\n.gt-viz {\n  position: fixed;\n  top: 0;\n  left: 0;\n  height: 100%;\n}\n\n\n/* SCREEN */\n.gt-screen {\n  display: flex;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n}\n\n/* NAVIGATION */\n.gt-screen__icosahedron {\n  position: fixed;\n  right: 2em;\n  top: 2em;\n  z-index: 9999;\n}\n\n/* NOW PLAYING */\n.gt-screen__nowplaying {\n  position: fixed;\n  left: 2em;\n  bottom: 2em;\n}\n\n.gt-screen__nowplaying-title {\n  margin: 0;\n  padding: 0;\n  font-size: 1.5em;\n  margin-top: -.25em;\n  font-weight: 100;\n  text-transform: lowercase;\n  position: relative;\n  left: -1px;\n}\n\n.gt-gt--nowplaying {\n  position: absolute;\n  left: -1em;\n  top: -1em;\n  font-size: .5em;\n}\n\n/* HERO */\n.gt-screen__title {\n  text-align: center;\n  margin: 0 auto;\n  /*display: flex;*/\n  align-items: flex-start;\n  justify-content: center;\n  background: rgba(255, 240, 245, .95);\n  color: #444;\n  padding: 4em;\n  position: relative;\n  z-index: 1000;\n  border: 1px solid rgba(255, 255, 255, .25);\n  /*box-shadow:  \n    16px 0 32px rgba(30, 45, 200, .45),\n    -16px 0 32px rgba(250, 40, 30, .5);*/\n  border-radius: 50%;\n  position: relative;\n}\n/*\n.gt-screen__title:after,\n.gt-screen__title:before {\n  top: 0;\n  left: 0;\n  content:\"\";\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  z-index: -10;\n}\n\n.gt-screen__title:after {\n  left: -1em;\n  background: rgba(30, 45, 200, .45);\n  \n}\n\n.gt-screen__title:before {\n  left: 1em;\n  background: rgba(250, 40, 30, .5);\n}\n*/\n\n.gt-title,\n.gt-subtitle {\n  margin: 0;\n  line-height: 1;\n  /**/\n}\n\n.gt-title {\n  font-size: 1.75em;\n  text-align: center;\n}\n\n.gt-title .gt-typewriter span {\n  width: 1.25em;\n}\n\n.gt-subtitle {\n  font-weight: 100;\n  font-size: .7em;\n  margin-top: 1em;\n}\n\n.gt-button--launch {\n  background: transparent;\n  margin-top: 2em;\n  border: transparent;\n}\n\n/* FOOTER */\n.gt-screen__footer {\n  position: fixed;\n  bottom: 1em;\n  width: 100%;\n  text-align: center;\n}\n\n.gt-webgl-unavailable {\n  opacity: .75;\n  text-transform: lowercase;\n  position: fixed;\n  top: 1em;\n  width: 100%;\n  text-align: center;\n  font-size: .75em;\n}\n\n.gt-footer__credits {\n  opacity: .5;\n  font-size: .75em;\n  text-transform: lowercase;\n  font-weight: 100;\n  letter-spacing: .1em;\n  line-height: 1.5;\n}\n\n.gt-footer__credits a {\n  text-decoration: none;\n}\n\n/* TOOLBAR */\n.gt-screen__toolbar {\n  position: fixed;\n  right: 2em;\n  bottom: 2em;\n  text-align: center;\n}\n\n.gt-screen__mute {\n  cursor: pointer;\n}\n\n.gt-screen__mute-label {\n  font-size: .5em;\n}", ""]);
 
 	// exports
 
@@ -63881,7 +63946,7 @@
 
 
 	// module
-	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 13px;\n}\n\n@media screen and (min-width: 480px) {\n  html,\n  body {\n    font-size: 14px;\n  }\n}\n\n@media screen and (min-width: 768px) {\n  html,\n  body {\n    font-size: 15px;\n  }\n}\n\n@media screen and (min-width: 1280px) {\n  html,\n  body {\n    font-size: 16px;\n  }\n}\n\n\n@media screen and (min-width: 1441px) {\n  html,\n  body {\n    font-size: 20px;\n  }\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-title--light {\n  font-weight: 200;\n}\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}\n\n.gt-text--small {\n  font-size: .85em;\n}\n\n.gt-text--secondary {\n  opacity: .5;\n  line-height: 1;\n}", ""]);
+	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 13px;\n}\n\n@media screen and (min-width: 480px) {\n  html,\n  body {\n    font-size: 14px;\n  }\n}\n\n@media screen and (min-width: 768px) {\n  html,\n  body {\n    font-size: 15px;\n  }\n}\n\n@media screen and (min-width: 1280px) {\n  html,\n  body {\n    font-size: 16px;\n  }\n}\n\n\n@media screen and (min-width: 1441px) {\n  html,\n  body {\n    font-size: 20px;\n  }\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\n.serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-title--light {\n  font-weight: 200;\n}\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}\n\n.gt-text--small {\n  font-size: .85em;\n}\n\n.gt-text--secondary {\n  opacity: .5;\n  line-height: 1;\n}\n\n.gt-text--centered {\n  text-align: center;\n}", ""]);
 
 	// exports
 
@@ -63895,7 +63960,7 @@
 
 
 	// module
-	exports.push([module.id, "\n/* tracklist */\n.gt-track--tracklist {\n  display: flex;\n  line-height: 1;\n  align-items: center;\n  padding: 1.5em 0;\n  border-bottom: 1px solid rgba(0, 0, 0, .1)\n}\n\n.gt-track__pos {\n  width: 40px;\n  margin-left: -40px;\n  font-size: .6em;\n  align-self: flex-start;\n  font-weight: 800;\n  color: rgba(0, 0, 0, .5);\n}\n\n.gt-track__track {\n  /* flex: 1; */\n  font-size: 1.5em;\n  font-weight: 100;\n}\n\n.gt-track__duration {\n  width: 80px;\n  margin-left: auto;\n  text-align: right;\n  font-weight: 100;\n  font-size: .7em;\n}\n\n.gt-tracklist__artwork {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 35vh;\n  overflow: hidden;\n}\n\n.gt-tracklist__artwork img {\n  width: 100% !important;\n  height: auto;\n   margin-top: -25%;\n}", ""]);
+	exports.push([module.id, "\n/* tracklist */\n.gt-track--tracklist {\n  display: flex;\n  line-height: 1;\n  align-items: center;\n  padding: 1.5em 0;\n  border-bottom: 1px solid rgba(0, 0, 0, .1)\n}\n\n.gt-track__pos {\n  width: 40px;\n  margin-left: -40px;\n  font-size: .6em;\n  align-self: flex-start;\n  font-weight: 800;\n  color: rgba(0, 0, 0, .5);\n}\n\n.gt-track__track {\n  /* flex: 1; */\n  font-size: 1.125em;\n  font-weight: 100;\n}\n\n.gt-track__track a {\n  color: #444;\n}\n\n.gt-track__duration {\n  width: 80px;\n  margin-left: auto;\n  text-align: right;\n  font-weight: 100;\n  font-size: .7em;\n}\n\n.gt-tracklist__artwork {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 35vh;\n  overflow: hidden;\n  z-index: -1;\n}\n\n.gt-tracklist__artwork:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n  background: rgba(255, 255, 255, .5);\n}\n\n.gt-tracklist__artwork img {\n  width: 100% !important;\n  height: auto;\n   margin-top: -25%;\n}\n\n.gt-tracklist a.gt-button {\n  color: #777;\n  font-weight: 800;\n  text-transform: lowercase;\n}", ""]);
 
 	// exports
 

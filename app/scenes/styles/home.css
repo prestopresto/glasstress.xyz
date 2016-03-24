@@ -124,6 +124,37 @@
   border: transparent;
 }
 
+/* FOOTER */
+.gt-screen__footer {
+  position: fixed;
+  bottom: 1em;
+  width: 100%;
+  text-align: center;
+}
+
+.gt-webgl-unavailable {
+  opacity: .75;
+  text-transform: lowercase;
+  position: fixed;
+  top: 1em;
+  width: 100%;
+  text-align: center;
+  font-size: .75em;
+}
+
+.gt-footer__credits {
+  opacity: .5;
+  font-size: .75em;
+  text-transform: lowercase;
+  font-weight: 100;
+  letter-spacing: .1em;
+  line-height: 1.5;
+}
+
+.gt-footer__credits a {
+  text-decoration: none;
+}
+
 /* TOOLBAR */
 .gt-screen__toolbar {
   position: fixed;

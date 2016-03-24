@@ -11,7 +11,7 @@ let geometry;
 let pCount;
 
 
-export function setup(particleCount=2048, size=8) {
+export function setup(particleCount=2048, size=6) {
   geometry = new THREE.Geometry();
   const textureLoader = new THREE.TextureLoader()
   const texture = THREE.ImageUtils.loadTexture('/assets/tests/particle-1.png');
@@ -19,7 +19,7 @@ export function setup(particleCount=2048, size=8) {
   const material = new THREE.PointsMaterial({
     size: size,
     transparent: true,
-    opacity: Math.random()+0.5,
+    opacity: Math.random()+0.4,
     map: texture,
     fog: false,
     // alphaTest: true,

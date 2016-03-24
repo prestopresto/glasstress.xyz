@@ -281,11 +281,12 @@ export function setVolumeLevel(level) {
   audio.volume=level/100
 }
 
-export function playScene() {
+export function playScene(playVisualization=true) {
   // PLAY AUDIO
-  //
-  scene.add(sphereMesh);
-  noisePass.params.speed = 1;
+  if(playVisualization) {
+    scene.add(sphereMesh);
+    noisePass.params.speed = 1;
+  }
   playing = true
   audio.play()
 }
@@ -678,7 +679,7 @@ export function render() {
   bloomPass.params.blurAmount = 1.0
 
   if(dotting) {
-    bloomPass.params.blurAmount = 5.0
+    bloomPass.params.blurAmount = 3.0
     composer.pass( bloomPass );
   }
 

@@ -145,7 +145,7 @@ export default class Navigation extends Component {
                 }}>
                 {show && <div key="info" className="gt-navigation__info">
                   <span className="gt-text">
-                    get the full album <a target="_blank" href="http://glasstress.lnk.to/CasacciMana">here</a><br/>
+                    preview, stream or download album <a target="_blank" href="http://glasstress.lnk.to/CasacciMana">here</a><br/>
                   </span>
                   <span className="gt-text--small gt-text--secondary">available for spotify, itunes, apple music, deezer, google play, amazon mp3</span>
                 </div>}
@@ -156,8 +156,7 @@ export default class Navigation extends Component {
                       <img src="/assets/imgs/badpanda-logo.jpg" width={32} style={{verticalAlign:'middle',borderRadius:'50%',marginBottom:'1em'}}/>
                     </a>
                     <br/>
-                    Edited &amp; Distributed by <a target="_blank" href="http://badpandarecords.bandcamp.com/">Bad Panda Records</a> <sub>&gt;</sub> website+3d: <a href="http://prestopresto.co">presto</a>
-                    <br/>&copy; 2016 all rights reverved
+                    Courtesy of <a target="_blank" href="http://badpandarecords.bandcamp.com/">Bad Panda Records</a>
                   </span>
                 </div>
               </div>

@@ -46,7 +46,7 @@ a:link {
   color: #fff;
 }
 
-p, .serif, .gt-text--serif {
+.serif, .gt-text--serif {
   font-family: Lora, serif;
   line-height: 1.5;
   font-weight: 100;
@@ -76,4 +76,8 @@ h3 {
 .gt-text--secondary {
   opacity: .5;
   line-height: 1;
+}
+
+.gt-text--centered {
+  text-align: center;
 }

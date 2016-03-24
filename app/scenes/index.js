@@ -20,6 +20,22 @@ require('whatwg-fetch');
 
 require('./styles/home.css')
 
+
+function webglAvailable() {
+  try {
+      var canvas = document.createElement("canvas");
+      return !!
+          window.WebGLRenderingContext && 
+          (canvas.getContext("webgl") || 
+              canvas.getContext("experimental-webgl"));
+  } catch(e) { 
+      return false;
+  } 
+}
+
+const isWebglAvailable = webglAvailable()
+
+
 export default class Scene extends Component {
 
   constructor(props) {
@@ -35,11 +51,18 @@ export default class Scene extends Component {
       currentSection: null,
       canLaunch: false,
       volumeLevel: 90,
+      webglAvailable: true
     }
 
     this.mouseOver = this.mouseOver.bind(this)
     this.mouseOut = this.mouseOut.bind(this)
     this.changeVolume = this.changeVolume.bind(this)
+
+    if(!isWebglAvailable) {
+      this.state.webglAvailable = false,
+      this.state.canLaunch = true
+      return this
+    }
 
     // load track audio data
     fetch('/app/data/track-data2.json')
@@ -82,7 +105,7 @@ export default class Scene extends Component {
 
     if(this.state.launched && !prevState.launched) {
       setTimeout(() => {
-        visualization.playScene()
+        visualization.playScene(this.state.webglAvailable)
       }, 2000)
       
     }
@@ -269,7 +292,35 @@ export default class Scene extends Component {
           </div>}
         </Transition>
       </div>
+
+      {!this.state.webglAvailable && <p className="gt-webgl-unavailable">
+        Your browser doesn't support WebGL!<br/>
+        To live the full experience please get a WebGL enabled browser, like Firefox, Chrome or Safari.
+      </p>}
       
+      {/* FOOTER */}
+      <Transition
+        runOnMount={true}
+        component={false} // don't use a wrapping component
+        enter={{
+          opacity: 1,
+          translateY: spring(0)
+        }}
+        leave={{
+          opacity: 0,
+          translateY: 600
+        }}>
+        {!this.state.launched && !showNavigation && 
+          <div key="footer" className="gt-screen__footer">
+            <p className="gt-footer__credits">
+              <sub>></sub>
+              <br/>
+              courtesy of <strong><a href="http://badpandarecords.bandcamp.com" target="_blank">bad panda records</a></strong><br/>
+              design &amp; 3D <strong><a href="http://prestopresto.co" target="_blank">prestopresto</a></strong>
+            </p>
+          </div>}
+      </Transition>
+
       {/* CONTENT DRAWER */}
       <Transition
         runOnMount={true}

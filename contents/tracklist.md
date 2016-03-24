@@ -5,7 +5,7 @@
       01<sub>></sub>
     </div>
     <div class="gt-track__track">
-      Glasstress
+      <a href="http://badpandarecords.bandcamp.com/track/glasstress">Glasstress</a>
     </div>
     <div class="gt-track__duration">
       05:14
@@ -17,7 +17,7 @@
       02<sub>></sub>
     </div>
     <div class="gt-track__track">
-      Like A Glass Angel
+      <a href="http://badpandarecords.bandcamp.com/track/like-a-glass-angel">Like A Glass Angel</a>
     </div>
     <div class="gt-track__duration">
       03:45
@@ -29,7 +29,7 @@
       03<sub>></sub>
     </div>
     <div class="gt-track__track">
-      Vetrosequenza
+      <a href="http://badpandarecords.bandcamp.com/track/vetrosequenza">Vetrosequenza</a>
     </div>
     <div class="gt-track__duration">
       03:11
@@ -41,7 +41,7 @@
       04<sub>></sub>
     </div>
     <div class="gt-track__track">
-      Jingling Flames
+      <a href="http://badpandarecords.bandcamp.com/track/jingling-flames">Jingling Flames</a>
     </div>
     <div class="gt-track__duration">
       04:48
@@ -53,7 +53,7 @@
       05<sub>></sub>
     </div>
     <div class="gt-track__track">
-      Glasscape Grinder
+      <a href="http://badpandarecords.bandcamp.com/track/glasscape-grinder">Glasscape Grinder</a>
     </div>
     <div class="gt-track__duration">
       04:27
@@ -65,7 +65,7 @@
       06<sub>></sub>
     </div>
     <div class="gt-track__track">
-      The Wood
+      <a href="http://badpandarecords.bandcamp.com/track/the-wood">The Wood</a>
     </div>
     <div class="gt-track__duration">
       06:45
@@ -77,7 +77,7 @@
       07<sub>></sub>
     </div>
     <div class="gt-track__track">
-      Murano Notte
+      <a href="http://badpandarecords.bandcamp.com/track/murano-notte">Murano Notte</a>
     </div>
     <div class="gt-track__duration">
       05:29
@@ -89,7 +89,7 @@
       08<sub>></sub>
     </div>
     <div class="gt-track__track">
-      Glassroom
+      <a href="http://badpandarecords.bandcamp.com/track/glassroom">Glassroom</a>
     </div>
     <div class="gt-track__duration">
       07:10
@@ -98,9 +98,10 @@
 
   <br/>
 
-  <p class="gt-text--centered">
-    <img src="/assets/imgs/bandcamp-button-circle.png" width=64 height=64 />
+  <p class="gt-serif gt-text--centered">
+    <a class="gt-button" href="#">
+      Preview, stream or download full album
+    </a>
   </p>
 
-  <iframe style="border: 0; width: 100%; height: 406px;" src="https://bandcamp.com/EmbeddedPlayer/album=2422508932/size=large/bgcol=ffffff/linkcol=0687f5/artwork=none/transparent=true/tracklist=true/tracks=1524922610,2935554985,2391953850,2756155210,509914577,2235687708,2049031557,3856892632/esig=bd2d7e3c70f4e30326aeca1f4edbb668/" seamless><a href="http://badpandarecords.bandcamp.com/album/max-casacci-daniele-mana-glasstress">Max Casacci &amp; Daniele Mana - Glasstress by Bad Panda</a></iframe>
 </div>

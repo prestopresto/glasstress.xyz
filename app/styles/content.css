@@ -19,8 +19,12 @@
 
 .gt-track__track {
   /* flex: 1; */
-  font-size: 1.5em;
+  font-size: 1.125em;
   font-weight: 100;
+}
+
+.gt-track__track a {
+  color: #444;
 }
 
 .gt-track__duration {
@@ -38,10 +42,27 @@
   width: 100%;
   height: 35vh;
   overflow: hidden;
+  z-index: -1;
+}
+
+.gt-tracklist__artwork:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, .5);
 }
 
 .gt-tracklist__artwork img {
   width: 100% !important;
   height: auto;
    margin-top: -25%;
+}
+
+.gt-tracklist a.gt-button {
+  color: #777;
+  font-weight: 800;
+  text-transform: lowercase;
 }
