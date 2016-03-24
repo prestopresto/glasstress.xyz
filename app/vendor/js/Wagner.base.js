@@ -656,7 +656,7 @@ WAGNER.FXAAPass = function() {
 
   WAGNER.Pass.call( this );
   WAGNER.log( 'FXAA Pass constructor' );
-  this.loadShader( 'fxaa2-fs.glsl' );
+  this.loadShader( 'fxaa-fs.glsl' );
 
 };
 

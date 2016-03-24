@@ -321,6 +321,42 @@ export default class Scene extends Component {
           </div>}
       </Transition>
 
+      <Transition
+        runOnMount={true}
+        component={false}
+        appear={{
+          opacity: 0,
+          translateY: -1200
+        }}
+        enter={{
+          opacity: 1,
+          translateY: 0
+        }}
+        leave={{
+          opacity: 0,
+          translateY: -1200
+        }}>
+        {this.state.pageIdx > -1 && <div key="paper-bg-lx" className="gt-paper__background gt-paper__background--lx" />}
+      </Transition>
+
+      <Transition
+        runOnMount={true}
+        component={false}
+        appear={{
+          opacity: 0,
+          translateY: 1200
+        }}
+        enter={{
+          opacity: 1,
+          translateY: 0
+        }}
+        leave={{
+          opacity: 0,
+          translateY: 1200
+        }}>
+        {this.state.pageIdx > -1 && <div key="paper-bg-lx" className="gt-paper__background gt-paper__background--rx" />}
+      </Transition>
+
       {/* CONTENT DRAWER */}
       <Transition
         runOnMount={true}

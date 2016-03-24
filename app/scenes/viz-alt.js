@@ -68,6 +68,7 @@ var amplitudeData = new Uint8Array(bufferLength)
 var currentBeat;
 var lastBeat = {};
 var spacePressed = false;
+var remixMode = false;
 var dotting = false;
 
 import { setupData, audioData, getBeatsByTime, getSegmentsByTime, getBarsByTime, getTatumsByTime, getScenesByTime } from '../lib/audio-data'
@@ -249,6 +250,9 @@ export function init() {
   composer = new WAGNER.Composer( renderer, { useRGBA: true } );
   composer.setSize( window.innerWidth, window.innerHeight ); // or whatever resolution
   
+  rgbSplitPass = new WAGNER.RGBSplitPass()
+  rgbSplitPass.params.delta.x = 2.0
+  rgbSplitPass.params.delta.y = -2.0
   dirtPass = new WAGNER.DirtPass();
   blendPass = new WAGNER.BlendPass();
   bloomPass = new WAGNER.MultiPassBloomPass();
@@ -264,9 +268,10 @@ export function init() {
   chromaticAbberationPass.params.amount = 100
   oldVideoPass = new WAGNER.OldVideoPass()
   dotScreenPass = new WAGNER.DotScreenPass()
-  halftoneCMYKPass = new WAGNER.HalftoneCMYKPass()
+  //halftoneCMYKPass = new WAGNER.HalftoneCMYKPass()
   barrelBlurPass = new WAGNER.PoissonDiscBlurPass()
 
+  document.addEventListener( 'mousedown', onDocumentMouseDown, false )
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
   document.addEventListener( 'touchstart', onDocumentTouchStart, false );
   document.addEventListener( 'touchmove', onDocumentTouchMove, false );
@@ -277,7 +282,6 @@ export function init() {
 }
 
 export function setVolumeLevel(level) {
-  console.log('level', level)
   audio.volume=level/100
 }
 
@@ -346,7 +350,6 @@ function addBeat(beat, num) {
     })
     .start()
 
-  console.log('num', num, num % 16)
 }
 
 function addBar(bar) {
@@ -404,12 +407,17 @@ function addSegment(segment, radius=10, multiplyScalar=10) {
     const _mesh = new THREE.Mesh(geometry, material)
 
     _mesh.rotation.set(Math.random() * 1, Math.random() * 1, Math.random() * 1)
-    _mesh.position.set(
-      Math.random() * 1.0 - 0.5,
-      0,
-      -1)
     _mesh.scale.set(1,1,1)
-    _mesh.position.multiplyScalar(loudnessMax * 1250)
+    
+
+    if(remixMode) {
+      _mesh.position.x = mouseX*2
+      _mesh.position.y = -mouseY*2
+    } else {
+      _mesh.position.set(Math.random() * 1.0 - 0.5, 0, -1)
+      _mesh.position.multiplyScalar(loudnessMax * 1250)
+    }
+
     _mesh.castShadow = true
     _mesh.receiveShadow = false
   
@@ -453,8 +461,6 @@ function tweenSegment(m, loudness, duration, delay=1, remove=true) {
 function tweenSegmentOut(mesh, duration=100, scalarValue=100, remove=false) {
   const position = mesh.position.clone()
   const newPosition = position.multiplyScalar(10)
-  console.log('position', position.x)
-  console.log('newPosition', newPosition.x)
   newPosition.z = Math.random()*10
 
   var tween = new TWEEN
@@ -590,15 +596,13 @@ export function animate(time) {
   }
 
   if(currentBeat && currentBeat.start != lastBeat.start) {
-    
-    console.log('sceneCount', sceneCount)
+  
 
     if(sceneCount >= 5 && sceneCount <= 6 && beatsCount % 1 == 0) {
       addBeat(currentBeat, beatsCount)
     }
 
     if(beatsCount % 8 == 0) {
-      console.log('beat', currentBeat.confidence)
       addBeat(currentBeat, beatsCount)
     }
 
@@ -664,11 +668,13 @@ export function render() {
 
   //renderer.render(scene, camera)
   
-  composer.pass( chromaticAbberationPass );
+  //
   //composer.pass( vignettePass );
   composer.pass( FXAAPass );
+  composer.pass( rgbSplitPass );
   composer.pass( noisePass );
   composer.pass( vignettePass )
+
   
   if(spacePressed) {
     composer.pass( dotScreenPass)
@@ -683,7 +689,18 @@ export function render() {
     composer.pass( bloomPass );
   }
 
+  //map mouse x/y to biquadfilter
+  if(remixMode) {
+    biquadFilter.frequency.value = mouseX + windowHalfX;
+    biquadFilter.gain.value = (((mouseY+windowHalfY)/screenY)*25);  
+  } else {
+    biquadFilter.frequency.value = 0
+    biquadFilter.gain.value = 0
+  }
   
+
+  console.log(biquadFilter.frequency.value, biquadFilter.gain.value)
+
   composer.pass( bloomPass );
   //composer.pass( oldVideoPass );
   composer.toScreen();
@@ -693,8 +710,11 @@ export function render() {
 //EVENTS
 
 function onWindowResize() {
-  windowHalfX = window.innerWidth / 2;
-  windowHalfY = window.innerHeight / 2;
+  screenX = window.innerWidth
+  screenY = window.innerHeight
+  windowHalfX = screenX / 2;
+  windowHalfY = screenY / 2;
+
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
@@ -730,4 +750,12 @@ function onDocumentKeyUp(evt) {
   if(evt.keyCode==32) {
     spacePressed=false
   }
+}
+
+export function toggleRemixeMode() {
+  remixMode=!remixMode
+}
+
+function onDocumentMouseDown(evt) {
+  remixMode=!remixMode
 }

@@ -11,22 +11,26 @@ export default function fft(id) {
 
   //set up the different audio nodes we will use for the app
   var analyser = audioCtx.createAnalyser();
-  //var distortion = audioCtx.createWaveShaper();
-  //var gainNode = audioCtx.createGain();
-  //var biquadFilter = audioCtx.createBiquadFilter();
-  //var convolver = audioCtx.createConvolver();
+  var distortion = audioCtx.createWaveShaper();
+  var gainNode = audioCtx.createGain();
+  var biquadFilter = audioCtx.createBiquadFilter();
+  var convolver = audioCtx.createConvolver();
 
   // connect the nodes together
   source.connect(analyser);
-  //analyser.connect(distortion);
-  //distortion.connect(biquadFilter);
-  //biquadFilter.connect(convolver);
-  // convolver.connect(gainNode);
-  //biquadFilter.connect(audioCtx.destination);
-  analyser.connect(audioCtx.destination)
-  //biquadFilter.type = "lowshelf";
-  //biquadFilter.frequency.value = 1000;
-  //biquadFilter.gain.value = 25;
+  analyser.connect(distortion);
+  distortion.connect(biquadFilter);
+  biquadFilter.connect(convolver);
+  //convolver.connect(gainNode);
+  //gainNode.connect(audioCtx.destination)
+
+  biquadFilter.connect(audioCtx.destination);
+  //analyser.connect(audioCtx.destination)
+  biquadFilter.type = "lowshelf";
+
+  biquadFilter.frequency.value = 0;
+  biquadFilter.gain.value = 0;
+
 
   // Create a gain node
   // var gainNode = audioCtx.createGain();
@@ -55,5 +59,5 @@ export default function fft(id) {
   // frequencyBinCount tells you how many values you'll receive from the analyser
   //var frequencyData = new Uint8Array(analyser.frequencyBinCount)
 
-  return { audio, analyser, source }
+  return { audio, analyser, source, biquadFilter }
 }

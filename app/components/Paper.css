@@ -30,6 +30,20 @@
   margin-bottom: .25em;
 }
 
+.gt-paper__background {
+  background: #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+}
+
+.gt-paper__background--rx {
+  right: 0;
+  left: auto;
+}
+
 .gt-paper__content {
   max-width: 720px;
   margin: 0 auto;

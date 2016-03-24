@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { StaggeredMotion, Motion, spring } from 'react-motion'
+import Transition from 'react-motion-ui-pack'
 import TypeWriter from './TypeWriter'
 import Remarkable from 'remarkable'
 
