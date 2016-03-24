@@ -1,0 +1,8 @@
+.gt-navigation__item a {
+  transition: all .25s ease-out;
+  display: block;
+}
+
+.gt-navigation__item a:hover,active {
+  opacity: .6;
+}
