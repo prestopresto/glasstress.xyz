@@ -58664,7 +58664,7 @@
 	              _react2.default.createElement(
 	                'span',
 	                { className: 'gt-screen__nowplaying-label gt-text--subhead' },
-	                'now playing'
+	                _react2.default.createElement(_TypeWriter2.default, { word: 'nowplaying' })
 	              ),
 	              _react2.default.createElement(
 	                'h1',

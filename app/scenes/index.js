@@ -194,7 +194,7 @@ export default class Scene extends Component {
               &gt;
             </span>
             <span className="gt-screen__nowplaying-label gt-text--subhead">
-              now playing
+              <TypeWriter word="nowplaying" />
             </span>
             <h1 className="gt-screen__nowplaying-title">
               Like a Glass Angel
