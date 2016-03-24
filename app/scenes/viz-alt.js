@@ -271,10 +271,10 @@ export function init() {
   //halftoneCMYKPass = new WAGNER.HalftoneCMYKPass()
   barrelBlurPass = new WAGNER.PoissonDiscBlurPass()
 
-  document.addEventListener( 'mousedown', onDocumentMouseDown, false )
-  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-  document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-  document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+  document.getElementById('visualization').addEventListener( 'mousedown', onDocumentMouseDown, false )
+  document.getElementById('visualization').addEventListener( 'mousemove', onDocumentMouseMove, false );
+  document.getElementById('visualization').addEventListener( 'touchstart', onDocumentTouchStart, false );
+  document.getElementById('visualization').addEventListener( 'touchmove', onDocumentTouchMove, false );
   document.addEventListener( 'keydown', onDocumentKeyDown, false);
   document.addEventListener( 'keyup', onDocumentKeyUp, false);
   //
@@ -725,14 +725,14 @@ function onDocumentMouseMove( event ) {
 }
 function onDocumentTouchStart( event ) {
   if ( event.touches.length === 1 ) {
-    //event.preventDefault();
+    event.preventDefault();
     mouseX = event.touches[ 0 ].pageX - windowHalfX;
     mouseY = event.touches[ 0 ].pageY - windowHalfY;
   }
 }
 function onDocumentTouchMove( event ) {
   if ( event.touches.length === 1 ) {
-    //event.preventDefault();
+    event.preventDefault();
     mouseX = event.touches[ 0 ].pageX - windowHalfX;
     mouseY = event.touches[ 0 ].pageY - windowHalfY;
   }
