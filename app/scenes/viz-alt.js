@@ -405,8 +405,8 @@ function addSegment(segment, radius=10, multiplyScalar=10) {
     _mesh.rotation.set(Math.random() * 1, Math.random() * 1, Math.random() * 1)
     _mesh.position.set(
       Math.random() * 1.0 - 0.5,
-      Math.random() * 1.0 - 0.5,
-      0)
+      0,
+      -1)
     _mesh.scale.set(1,1,1)
     _mesh.position.multiplyScalar(loudnessMax * 1250)
     _mesh.castShadow = true
@@ -414,7 +414,7 @@ function addSegment(segment, radius=10, multiplyScalar=10) {
   
     object3d.add(_mesh)
     tweenSegment(_mesh, loudnessMax, segment.duration, i*(segment.duration/segmentLength)*1000)
-    tweenSegmentOut(_mesh, 4000, loudnessMax*500, true)
+    tweenSegmentOut(_mesh, segment.duration*8000, loudnessMax*500, true)
   }
 }
 
@@ -674,7 +674,6 @@ export function render() {
     composer.pass( bloomPass );
     //composer.pass( barrelBlurPass )
   }
-
 
   bloomPass.params.blurAmount = 1.0
 
