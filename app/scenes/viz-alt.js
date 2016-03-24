@@ -186,6 +186,7 @@ export function init() {
   
   // PARTICLES
   particleSystem = particles.setup()
+  particleSystem.position.y = -450
   scene.add(particleSystem)
 
   // SPHERE
@@ -285,7 +286,15 @@ export function playScene() {
   scene.add(sphereMesh);
   noisePass.params.speed = 1;
   playing = true
+  audio.play()
+}
 
+
+export function pause() {
+  audio.pause()
+}
+
+export function play() {
   audio.play()
 }
 
@@ -293,7 +302,7 @@ let beats=[]
 
 function addBeat(beat, num) {
   const radius = 12
-  const geometry = new THREE.TorusGeometry( radius, 0.5, 16, 3)//(radius, 32, 32);
+  const geometry = new THREE.TorusGeometry( radius, 0.5, 16, num % 4 == 0 ? 8 : 3)//(radius, 32, 32);
   const material = new THREE.MeshPhongMaterial({
     color: Math.random()*0xffffff, 
     transparent: true,
@@ -422,7 +431,7 @@ function tweenSegment(m, loudness, duration, delay=1, remove=true) {
       m.scale.set(this.scale, this.scale, this.scale)
     })
     .onComplete(function() {
-      tweenSegmentOut(m, 2000, loudness*100, true)
+      tweenSegmentOut(m, 2000, loudness*500, true)
     })
     .start()
     
@@ -506,6 +515,7 @@ var barDuration;
 
 var lastTime = 0
 var currentScene;
+var sceneCount=0;
 var currentSegment;
 var lastSegment = {};
 var lastScene = {};
@@ -573,7 +583,13 @@ export function animate(time) {
 
   if(currentBeat && currentBeat.start != lastBeat.start) {
     
-    if(beatsCount % 4 == 0) {
+    console.log('sceneCount', sceneCount)
+
+    if(sceneCount >= 0 && sceneCount <= 6 && beatsCount % 1 == 0) {
+      addBeat(currentBeat, beatsCount)
+    }
+
+    if(beatsCount % 8 == 0) {
       console.log('beat', currentBeat.confidence)
       addBeat(currentBeat, beatsCount)
     }
@@ -604,6 +620,7 @@ export function animate(time) {
 
   if(currentScene && currentScene.start != lastScene.start) {
     lastScene = currentScene  
+    sceneCount += 1
   }
     
   TWEEN.update()

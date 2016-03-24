@@ -168,7 +168,7 @@ export default class Scene extends Component {
       <div className="gt-screen">
 
         {/* VISUALIZATION PLACEHOLDER */}
-        <div id="visualization" className="gt-viz" />
+        <div id="visualization" className="gt-viz"/>
 
         {/* NAVIGATION */}
         <div className="gt-screen__icosahedron">
@@ -305,10 +305,15 @@ export default class Scene extends Component {
 
     if(volumeLevel == 0) {
       nextVolume = 25
+      visualization.play()
     }
 
     if(volumeLevel == 25) {
       nextVolume = 90
+    }
+
+    if(volumeLevel == 90) {
+      visualization.pause()
     }
 
     this.setState({

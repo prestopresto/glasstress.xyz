@@ -72,11 +72,11 @@ export default class Navigation extends Component {
 
     return (
       <div>
-        <div style={{textAlign:'center'}}>
-          <IcosahedronButton 
+        <div style={{textAlign:'center',cursor:'pointer'}} onClick={this.toggle}>
+          {/*<IcosahedronButton 
             onMouseOver={this.mouseOverButton}
             onMouseOut={this.mouseOutButton} 
-            onClick={this.toggle} />
+             />*/}
           <span className="gt-text--subhead">
             <TypeWriter word={show ? "close" : "menu"} />
           </span>

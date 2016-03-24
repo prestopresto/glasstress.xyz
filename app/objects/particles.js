@@ -19,7 +19,7 @@ export function setup(particleCount=2048, size=8) {
   const material = new THREE.PointsMaterial({
     size: size,
     transparent: true,
-    //opacity: Math.random()+0.3,
+    opacity: Math.random()+0.5,
     map: texture,
     fog: false,
     // alphaTest: true,
@@ -57,7 +57,7 @@ export function update(frequencyData, time) {
   
   for(var i=0; i<frequencyData.length;i++) {
     var particle = geometry.vertices[i];
-    particle.y = frequencyData[i]*2
+    particle.y = frequencyData[i]*3
 //    particle.x -= Math.sin(time)
 
     // if(particle.x < -2000) {

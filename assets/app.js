@@ -57387,11 +57387,7 @@
 	        null,
 	        _react2.default.createElement(
 	          'div',
-	          { style: { textAlign: 'center' } },
-	          _react2.default.createElement(_IcosahedronButton2.default, {
-	            onMouseOver: this.mouseOverButton,
-	            onMouseOut: this.mouseOutButton,
-	            onClick: this.toggle }),
+	          { style: { textAlign: 'center', cursor: 'pointer' }, onClick: this.toggle },
 	          _react2.default.createElement(
 	            'span',
 	            { className: 'gt-text--subhead' },
@@ -58287,7 +58283,7 @@
 	  var material = new _three2.default.PointsMaterial({
 	    size: size,
 	    transparent: true,
-	    //opacity: Math.random()+0.3,
+	    opacity: Math.random() + 0.5,
 	    map: texture,
 	    fog: false,
 	    // alphaTest: true,
@@ -58320,7 +58316,7 @@
 
 	  for (var i = 0; i < frequencyData.length; i++) {
 	    var particle = geometry.vertices[i];
-	    particle.y = frequencyData[i] * 2;
+	    particle.y = frequencyData[i] * 3;
 	    //    particle.x -= Math.sin(time)
 
 	    // if(particle.x < -2000) {
@@ -58793,10 +58789,15 @@
 
 	      if (volumeLevel == 0) {
 	        nextVolume = 25;
+	        visualization.play();
 	      }
 
 	      if (volumeLevel == 25) {
 	        nextVolume = 90;
+	      }
+
+	      if (volumeLevel == 90) {
+	        visualization.pause();
 	      }
 
 	      this.setState({
@@ -58825,6 +58826,8 @@
 	exports.init = init;
 	exports.setVolumeLevel = setVolumeLevel;
 	exports.playScene = playScene;
+	exports.pause = pause;
+	exports.play = play;
 	exports.animate = animate;
 	exports.render = render;
 
@@ -59028,6 +59031,7 @@
 
 	  // PARTICLES
 	  particleSystem = particles.setup();
+	  particleSystem.position.y = -450;
 	  scene.add(particleSystem);
 
 	  // SPHERE
@@ -59126,7 +59130,14 @@
 	  scene.add(sphereMesh);
 	  noisePass.params.speed = 1;
 	  playing = true;
+	  audio.play();
+	}
 
+	function pause() {
+	  audio.pause();
+	}
+
+	function play() {
 	  audio.play();
 	}
 
@@ -59134,7 +59145,7 @@
 
 	function addBeat(beat, num) {
 	  var radius = 12;
-	  var geometry = new _three2.default.TorusGeometry(radius, 0.5, 16, 3); //(radius, 32, 32);
+	  var geometry = new _three2.default.TorusGeometry(radius, 0.5, 16, num % 4 == 0 ? 8 : 3); //(radius, 32, 32);
 	  var material = new _three2.default.MeshPhongMaterial({
 	    color: Math.random() * 0xffffff,
 	    transparent: true,
@@ -59247,7 +59258,7 @@
 	  var tween = new _tween2.default.Tween({ scale: 0 }).delay(delay).to({ scale: scale }, duration * 1000).easing(_tween2.default.Easing.Elastic.Out).onUpdate(function (t) {
 	    m.scale.set(this.scale, this.scale, this.scale);
 	  }).onComplete(function () {
-	    tweenSegmentOut(m, 2000, loudness * 100, true);
+	    tweenSegmentOut(m, 2000, loudness * 500, true);
 	  }).start();
 
 	  // var tween = new TWEEN
@@ -59320,6 +59331,7 @@
 
 	var lastTime = 0;
 	var currentScene;
+	var sceneCount = 0;
 	var currentSegment;
 	var lastSegment = {};
 	var lastScene = {};
@@ -59391,7 +59403,13 @@
 
 	  if (currentBeat && currentBeat.start != lastBeat.start) {
 
-	    if (beatsCount % 4 == 0) {
+	    console.log('sceneCount', sceneCount);
+
+	    if (sceneCount >= 0 && sceneCount <= 6 && beatsCount % 1 == 0) {
+	      addBeat(currentBeat, beatsCount);
+	    }
+
+	    if (beatsCount % 8 == 0) {
 	      console.log('beat', currentBeat.confidence);
 	      addBeat(currentBeat, beatsCount);
 	    }
@@ -59419,6 +59437,7 @@
 
 	  if (currentScene && currentScene.start != lastScene.start) {
 	    lastScene = currentScene;
+	    sceneCount += 1;
 	  }
 
 	  _tween2.default.update();
@@ -63782,7 +63801,7 @@
 
 
 	// module
-	exports.push([module.id, "/* VISUALIZATION */\n.gt-viz {\n  position: fixed;\n  top: 0;\n  left: 0;\n  height: 100%;\n}\n\n\n/* SCREEN */\n.gt-screen {\n  display: flex;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n}\n\n/* NAVIGATION */\n.gt-screen__icosahedron {\n  position: fixed;\n  right: 1em;\n  top: 1em;\n  z-index: 9999;\n}\n\n/* NOW PLAYING */\n.gt-screen__nowplaying {\n  position: fixed;\n  left: 2em;\n  bottom: 2em;\n}\n\n.gt-screen__nowplaying-title {\n  margin: 0;\n  padding: 0;\n  font-size: 1.5em;\n  margin-top: -.25em;\n  font-weight: 100;\n  text-transform: lowercase;\n  position: relative;\n  left: -1px;\n}\n\n.gt-gt--nowplaying {\n  position: absolute;\n  left: -1em;\n  top: -1em;\n  font-size: .5em;\n}\n\n/* HERO */\n.gt-screen__title {\n  text-align: center;\n  margin: 0 auto;\n  /*display: flex;*/\n  align-items: flex-start;\n  justify-content: center;\n  background: rgba(255, 240, 245, .95);\n  color: #444;\n  padding: 4em;\n  position: relative;\n  z-index: 1000;\n  border: 1px solid rgba(255, 255, 255, .25);\n  /*box-shadow:  \n    16px 0 32px rgba(30, 45, 200, .45),\n    -16px 0 32px rgba(250, 40, 30, .5);*/\n  border-radius: 50%;\n  position: relative;\n}\n/*\n.gt-screen__title:after,\n.gt-screen__title:before {\n  top: 0;\n  left: 0;\n  content:\"\";\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  z-index: -10;\n}\n\n.gt-screen__title:after {\n  left: -1em;\n  background: rgba(30, 45, 200, .45);\n  \n}\n\n.gt-screen__title:before {\n  left: 1em;\n  background: rgba(250, 40, 30, .5);\n}\n*/\n\n.gt-title,\n.gt-subtitle {\n  margin: 0;\n  line-height: 1;\n  /**/\n}\n\n.gt-title {\n  font-size: 1.75em;\n  text-align: center;\n}\n\n.gt-title .gt-typewriter span {\n  width: 1.25em;\n}\n\n.gt-subtitle {\n  font-weight: 100;\n  font-size: .7em;\n  margin-top: 1em;\n}\n\n.gt-button--launch {\n  background: transparent;\n  margin-top: 2em;\n  border: transparent;\n}\n\n/* TOOLBAR */\n.gt-screen__toolbar {\n  position: fixed;\n  right: 2em;\n  bottom: 2em;\n  text-align: center;\n}\n\n.gt-screen__mute {\n  cursor: pointer;\n}\n\n.gt-screen__mute-label {\n  font-size: .5em;\n}", ""]);
+	exports.push([module.id, "/* VISUALIZATION */\n.gt-viz {\n  position: fixed;\n  top: 0;\n  left: 0;\n  height: 100%;\n}\n\n\n/* SCREEN */\n.gt-screen {\n  display: flex;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n}\n\n/* NAVIGATION */\n.gt-screen__icosahedron {\n  position: fixed;\n  right: 2em;\n  top: 2em;\n  z-index: 9999;\n}\n\n/* NOW PLAYING */\n.gt-screen__nowplaying {\n  position: fixed;\n  left: 2em;\n  bottom: 2em;\n}\n\n.gt-screen__nowplaying-title {\n  margin: 0;\n  padding: 0;\n  font-size: 1.5em;\n  margin-top: -.25em;\n  font-weight: 100;\n  text-transform: lowercase;\n  position: relative;\n  left: -1px;\n}\n\n.gt-gt--nowplaying {\n  position: absolute;\n  left: -1em;\n  top: -1em;\n  font-size: .5em;\n}\n\n/* HERO */\n.gt-screen__title {\n  text-align: center;\n  margin: 0 auto;\n  /*display: flex;*/\n  align-items: flex-start;\n  justify-content: center;\n  background: rgba(255, 240, 245, .95);\n  color: #444;\n  padding: 4em;\n  position: relative;\n  z-index: 1000;\n  border: 1px solid rgba(255, 255, 255, .25);\n  /*box-shadow:  \n    16px 0 32px rgba(30, 45, 200, .45),\n    -16px 0 32px rgba(250, 40, 30, .5);*/\n  border-radius: 50%;\n  position: relative;\n}\n/*\n.gt-screen__title:after,\n.gt-screen__title:before {\n  top: 0;\n  left: 0;\n  content:\"\";\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  z-index: -10;\n}\n\n.gt-screen__title:after {\n  left: -1em;\n  background: rgba(30, 45, 200, .45);\n  \n}\n\n.gt-screen__title:before {\n  left: 1em;\n  background: rgba(250, 40, 30, .5);\n}\n*/\n\n.gt-title,\n.gt-subtitle {\n  margin: 0;\n  line-height: 1;\n  /**/\n}\n\n.gt-title {\n  font-size: 1.75em;\n  text-align: center;\n}\n\n.gt-title .gt-typewriter span {\n  width: 1.25em;\n}\n\n.gt-subtitle {\n  font-weight: 100;\n  font-size: .7em;\n  margin-top: 1em;\n}\n\n.gt-button--launch {\n  background: transparent;\n  margin-top: 2em;\n  border: transparent;\n}\n\n/* TOOLBAR */\n.gt-screen__toolbar {\n  position: fixed;\n  right: 2em;\n  bottom: 2em;\n  text-align: center;\n}\n\n.gt-screen__mute {\n  cursor: pointer;\n}\n\n.gt-screen__mute-label {\n  font-size: .5em;\n}", ""]);
 
 	// exports
 
@@ -63796,7 +63815,7 @@
 
 
 	// module
-	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 16px;\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}", ""]);
+	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 13px;\n}\n\n@media screen and (min-width: 480px) {\n  html,\n  body {\n    font-size: 14px;\n  }\n}\n\n@media screen and (min-width: 768px) {\n  html,\n  body {\n    font-size: 15px;\n  }\n}\n\n@media screen and (min-width: 1280px) {\n  html,\n  body {\n    font-size: 16px;\n  }\n}\n\n\n@media screen and (min-width: 1441px) {\n  html,\n  body {\n    font-size: 20px;\n  }\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}", ""]);
 
 	// exports
 
