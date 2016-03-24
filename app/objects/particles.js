@@ -11,7 +11,7 @@ let geometry;
 let pCount;
 
 
-export function setup(particleCount=2048, size=2) {
+export function setup(particleCount=2048, size=8) {
   geometry = new THREE.Geometry();
   const textureLoader = new THREE.TextureLoader()
   const texture = THREE.ImageUtils.loadTexture('/assets/tests/particle-1.png');
@@ -51,18 +51,18 @@ export function setup(particleCount=2048, size=2) {
 }
 
 
-export function update(frequencyData) {
+export function update(frequencyData, time) {
 
   pCount = geometry.vertices.length;
   
   for(var i=0; i<frequencyData.length;i++) {
     var particle = geometry.vertices[i];
-    particle.y = frequencyData[i]*-2
-    particle.x -= Math.random()*2
+    particle.y = frequencyData[i]*2
+//    particle.x -= Math.sin(time)
 
-    if(particle.x < -2000) {
-      particle.x = window.innerWidth*2*Math.random()
-    }
+    // if(particle.x < -2000) {
+    //   particle.x = window.innerWidth*2*Math.random()
+    // }
   }
 
   // while (pCount--) {

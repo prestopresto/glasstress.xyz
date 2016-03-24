@@ -33,11 +33,13 @@ export default class Scene extends Component {
       audioLoaded: false,
       showLauncher: true,
       currentSection: null,
-      canLaunch: false
+      canLaunch: false,
+      volumeLevel: 90,
     }
 
     this.mouseOver = this.mouseOver.bind(this)
     this.mouseOut = this.mouseOut.bind(this)
+    this.changeVolume = this.changeVolume.bind(this)
 
     // load track audio data
     fetch('/app/data/track-data2.json')
@@ -202,7 +204,14 @@ export default class Scene extends Component {
 
         {/* VIZ TOOLBAR */}
         <div className="gt-screen__toolbar">
-          toolbar
+          <div className="gt-screen__mute" onClick={this.changeVolume}>
+            <img src="/assets/imgs/sound-icon.svg" width={32} style={{transition:'all .25s ease-out',opacity:this.state.volumeLevel/100+0.1}} />
+            <br/>
+            <span className="gt-screen__mute-label">
+              <TypeWriter word="volume" />
+            </span>
+            
+          </div>
         </div>
         
         {/* HERO */}
@@ -245,11 +254,6 @@ export default class Scene extends Component {
               label="play*" />}
           </div>}
         </Transition>
-
-
-
-        
-
       </div>
       
       {/* CONTENT DRAWER */}
@@ -293,5 +297,26 @@ export default class Scene extends Component {
       this.setState({ pageIdx, currentSection: item })
     }, 750)
     
+  }
+
+  changeVolume() {
+    const volumeLevel = this.state.volumeLevel
+    let nextVolume = 0;
+
+    if(volumeLevel == 0) {
+      nextVolume = 25
+    }
+
+    if(volumeLevel == 25) {
+      nextVolume = 90
+    }
+
+    this.setState({
+      volumeLevel: nextVolume
+    })
+
+    visualization.setVolumeLevel(nextVolume)
+
+
   }
 }

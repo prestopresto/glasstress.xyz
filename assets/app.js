@@ -58102,7 +58102,7 @@
 /* 123 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -58121,22 +58121,22 @@
 
 	  //set up the different audio nodes we will use for the app
 	  var analyser = audioCtx.createAnalyser();
-	  var distortion = audioCtx.createWaveShaper();
-	  var gainNode = audioCtx.createGain();
-	  var biquadFilter = audioCtx.createBiquadFilter();
-	  var convolver = audioCtx.createConvolver();
+	  //var distortion = audioCtx.createWaveShaper();
+	  //var gainNode = audioCtx.createGain();
+	  //var biquadFilter = audioCtx.createBiquadFilter();
+	  //var convolver = audioCtx.createConvolver();
 
 	  // connect the nodes together
 	  source.connect(analyser);
-	  analyser.connect(distortion);
-	  distortion.connect(biquadFilter);
-	  biquadFilter.connect(convolver);
+	  //analyser.connect(distortion);
+	  //distortion.connect(biquadFilter);
+	  //biquadFilter.connect(convolver);
 	  // convolver.connect(gainNode);
 	  //biquadFilter.connect(audioCtx.destination);
 	  analyser.connect(audioCtx.destination);
-	  biquadFilter.type = "lowshelf";
-	  biquadFilter.frequency.value = 1000;
-	  biquadFilter.gain.value = 25;
+	  //biquadFilter.type = "lowshelf";
+	  //biquadFilter.frequency.value = 1000;
+	  //biquadFilter.gain.value = 25;
 
 	  // Create a gain node
 	  // var gainNode = audioCtx.createGain();
@@ -58154,7 +58154,7 @@
 	  // filter.connect(gainNode);
 	  // gainNode.connect(audioCtx.destination);
 
-	  analyser.smoothingTimeConstant = 0.95;
+	  analyser.smoothingTimeConstant = 0.97;
 	  analyser.fftSize = 2048;
 
 	  //var bufferLength = analyser.frequencyBinCount
@@ -58278,7 +58278,7 @@
 
 	function setup() {
 	  var particleCount = arguments.length <= 0 || arguments[0] === undefined ? 2048 : arguments[0];
-	  var size = arguments.length <= 1 || arguments[1] === undefined ? 2 : arguments[1];
+	  var size = arguments.length <= 1 || arguments[1] === undefined ? 8 : arguments[1];
 
 	  geometry = new _three2.default.Geometry();
 	  var textureLoader = new _three2.default.TextureLoader();
@@ -58314,18 +58314,18 @@
 	  return particleSystem;
 	}
 
-	function update(frequencyData) {
+	function update(frequencyData, time) {
 
 	  pCount = geometry.vertices.length;
 
 	  for (var i = 0; i < frequencyData.length; i++) {
 	    var particle = geometry.vertices[i];
-	    particle.y = frequencyData[i] * -2;
-	    particle.x -= Math.random() * 2;
+	    particle.y = frequencyData[i] * 2;
+	    //    particle.x -= Math.sin(time)
 
-	    if (particle.x < -2000) {
-	      particle.x = window.innerWidth * 2 * Math.random();
-	    }
+	    // if(particle.x < -2000) {
+	    //   particle.x = window.innerWidth*2*Math.random()
+	    // }
 	  }
 
 	  // while (pCount--) {
@@ -58488,11 +58488,13 @@
 	      audioLoaded: false,
 	      showLauncher: true,
 	      currentSection: null,
-	      canLaunch: false
+	      canLaunch: false,
+	      volumeLevel: 90
 	    };
 
 	    _this.mouseOver = _this.mouseOver.bind(_this);
 	    _this.mouseOut = _this.mouseOut.bind(_this);
+	    _this.changeVolume = _this.changeVolume.bind(_this);
 
 	    // load track audio data
 	    fetch('/app/data/track-data2.json').then(function (res) {
@@ -58678,7 +58680,17 @@
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'gt-screen__toolbar' },
-	            'toolbar'
+	            _react2.default.createElement(
+	              'div',
+	              { className: 'gt-screen__mute', onClick: this.changeVolume },
+	              _react2.default.createElement('img', { src: '/assets/imgs/sound-icon.svg', width: 32, style: { transition: 'all .25s ease-out', opacity: this.state.volumeLevel / 100 + 0.1 } }),
+	              _react2.default.createElement('br', null),
+	              _react2.default.createElement(
+	                'span',
+	                { className: 'gt-screen__mute-label' },
+	                _react2.default.createElement(_TypeWriter2.default, { word: 'volume' })
+	              )
+	            )
 	          ),
 	          _react2.default.createElement(
 	            _reactMotionUiPack2.default,
@@ -58773,6 +58785,26 @@
 	        _this3.setState({ pageIdx: pageIdx, currentSection: item });
 	      }, 750);
 	    }
+	  }, {
+	    key: 'changeVolume',
+	    value: function changeVolume() {
+	      var volumeLevel = this.state.volumeLevel;
+	      var nextVolume = 0;
+
+	      if (volumeLevel == 0) {
+	        nextVolume = 25;
+	      }
+
+	      if (volumeLevel == 25) {
+	        nextVolume = 90;
+	      }
+
+	      this.setState({
+	        volumeLevel: nextVolume
+	      });
+
+	      visualization.setVolumeLevel(nextVolume);
+	    }
 	  }]);
 
 	  return Scene;
@@ -58791,6 +58823,7 @@
 	});
 	exports.setupAudioData = setupAudioData;
 	exports.init = init;
+	exports.setVolumeLevel = setVolumeLevel;
 	exports.playScene = playScene;
 	exports.animate = animate;
 	exports.render = render;
@@ -58939,7 +58972,7 @@
 	  scene.add(new _three2.default.AmbientLight(0x47E4E0));
 
 	  // CAMERA
-	  camera = new _three2.default.PerspectiveCamera(200, screenX / screenY, 1, 20000);
+	  camera = new _three2.default.PerspectiveCamera(120, screenX / screenY, 1, 20000);
 
 	  camera.position.z = 1850;
 	  camera.position.y = 10;
@@ -59012,7 +59045,8 @@
 	    opacity: .25,
 	    depthWrite: false,
 	    side: _three2.default.DoubleSide,
-	    wireframe: true
+	    wireframe: true,
+	    wireframeLinewidth: 2
 	  });
 
 	  //shading: THREE.FlatShading
@@ -59020,7 +59054,8 @@
 	    //shading: THREE.FlatShading,
 	    transparent: true,
 	    opacity: .15,
-	    wireframe: true
+	    wireframe: true,
+	    wireframeLinewidth: 2
 	  });
 
 	  var geometry = new _three2.default.SphereGeometry(1200, 8, 8);
@@ -59069,6 +59104,7 @@
 	  chromaticAbberationPass.params.amount = 100;
 	  oldVideoPass = new WAGNER.OldVideoPass();
 	  dotScreenPass = new WAGNER.DotScreenPass();
+	  halftoneCMYKPass = new WAGNER.HalftoneCMYKPass();
 
 	  document.addEventListener('mousemove', onDocumentMouseMove, false);
 	  document.addEventListener('touchstart', onDocumentTouchStart, false);
@@ -59077,6 +59113,11 @@
 	  document.addEventListener('keyup', onDocumentKeyUp, false);
 	  //
 	  window.addEventListener('resize', onWindowResize, false);
+	}
+
+	function setVolumeLevel(level) {
+	  console.log('level', level);
+	  audio.volume = level / 100;
 	}
 
 	function playScene() {
@@ -59099,6 +59140,7 @@
 	    transparent: true,
 	    specular: Math.random() * 0xffffff,
 	    wireframe: true,
+	    wireframeLinewidth: 4,
 	    opacity: 1.0
 	  });
 	  var _mesh = new _three2.default.Mesh(geometry, material);
@@ -59139,7 +59181,8 @@
 	    transparent: true,
 	    specular: Math.random() * 0xffffff,
 	    //shading: THREE.FlatShading
-	    wireframe: true
+	    wireframe: true,
+	    wireframeLinewidth: 2
 	  });
 	  var _mesh = new _three2.default.Mesh(geometry, material);
 	  _mesh.scale.set(0, 0, 0);
@@ -59167,13 +59210,15 @@
 	  var segmentLength = isLoud ? 3 : 1;
 
 	  for (var i = 0; i < segmentLength; i++) {
-	    var _radius = logScale([0.7, 0.99], [1, 96], loudnessMax);
+	    var _radius = logScale([0.7, 0.99], [1, 72], loudnessMax);
 	    var geometry = new _three2.default.SphereGeometry(_radius, 1, 1); //(radius, 32, 32);
 	    var material = new _three2.default.MeshPhongMaterial({
 	      color: Math.random() * 0xffffff,
+	      //color: 0xffffff,
 	      transparent: true,
 	      //specular: Math.random() * 0xffffff,
 	      wireframe: !isLoud,
+	      wireframeLinewidth: 2,
 	      shading: isLoud ? _three2.default.FlatShading : _three2.default.SmoothShading
 	    });
 
@@ -59202,7 +59247,7 @@
 	  var tween = new _tween2.default.Tween({ scale: 0 }).delay(delay).to({ scale: scale }, duration * 1000).easing(_tween2.default.Easing.Elastic.Out).onUpdate(function (t) {
 	    m.scale.set(this.scale, this.scale, this.scale);
 	  }).onComplete(function () {
-	    tweenSegmentOut(m, 2000, loudness * 2000, true);
+	    tweenSegmentOut(m, 2000, loudness * 100, true);
 	  }).start();
 
 	  // var tween = new TWEEN
@@ -59377,13 +59422,14 @@
 	  }
 
 	  _tween2.default.update();
+
+	  render();
+	  requestAnimationFrame(animate);
+
 	  if (playing) {
 	    analyser.getByteFrequencyData(frequencyData);
 	    //analyser.getByteTimeDomainData(amplitudeData)
 	  }
-
-	  render();
-	  requestAnimationFrame(animate);
 	}
 
 	var closk = new _three2.default.Clock();
@@ -59401,13 +59447,12 @@
 	  composer.reset();
 	  composer.render(scene, camera);
 
-	  // composer.pass( dirtPass );
-	  composer.pass(chromaticAbberationPass);
+	  //renderer.render(scene, camera)
 
-	  //composer.pass( bloomPass );
-	  composer.pass(noisePass);
-	  composer.pass(vignettePass);
+	  composer.pass(chromaticAbberationPass);
+	  //composer.pass( vignettePass );
 	  composer.pass(FXAAPass);
+	  composer.pass(noisePass);
 
 	  if (spacePressed) {
 	    composer.pass(dotScreenPass);
@@ -59421,6 +59466,7 @@
 	    composer.pass(bloomPass);
 	  }
 
+	  composer.pass(bloomPass);
 	  //composer.pass( oldVideoPass );
 	  composer.toScreen();
 	}
@@ -62783,7 +62829,7 @@
 
 	  WAGNER.Pass.call(this);
 	  WAGNER.log('FXAA Pass constructor');
-	  this.loadShader('fxaa-fs.glsl');
+	  this.loadShader('fxaa2-fs.glsl');
 	};
 
 	WAGNER.FXAAPass.prototype = Object.create(WAGNER.Pass.prototype);
@@ -63736,7 +63782,7 @@
 
 
 	// module
-	exports.push([module.id, "/* VISUALIZATION */\n.gt-viz {\n  position: fixed;\n  top: 0;\n  left: 0;\n  height: 100%;\n}\n\n\n/* SCREEN */\n.gt-screen {\n  display: flex;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n}\n\n/* NAVIGATION */\n.gt-screen__icosahedron {\n  position: fixed;\n  right: 1em;\n  top: 1em;\n  z-index: 9999;\n}\n\n/* NOW PLAYING */\n.gt-screen__nowplaying {\n  position: fixed;\n  left: 2em;\n  bottom: 2em;\n}\n\n.gt-screen__nowplaying-title {\n  margin: 0;\n  padding: 0;\n  font-size: 1.5em;\n  margin-top: -.25em;\n  font-weight: 100;\n  text-transform: lowercase;\n  position: relative;\n  left: -1px;\n}\n\n.gt-gt--nowplaying {\n  position: absolute;\n  left: -1em;\n  top: -1em;\n  font-size: .5em;\n}\n\n/* HERO */\n.gt-screen__title {\n\n  text-align: center;\n  margin: 0 auto;\n  /*display: flex;*/\n  align-items: flex-start;\n  justify-content: center;\n  background: rgba(255, 240, 245, .95);\n  color: #444;\n  padding: 4em;\n  position: relative;\n  z-index: 1000;\n  border: 1px solid rgba(255, 255, 255, .25);\n  box-shadow:  \n    16px 0 32px rgba(30, 45, 200, .45),\n    -16px 0 32px rgba(250, 40, 30, .5);\n  border-radius: 50%;\n}\n\n.gt-title,\n.gt-subtitle {\n  margin: 0;\n  line-height: 1;\n  /**/\n}\n\n.gt-title {\n  font-size: 1.75em;\n  text-align: center;\n}\n\n.gt-title .gt-typewriter span {\n  width: 1.25em;\n}\n\n.gt-subtitle {\n  font-weight: 100;\n  font-size: .7em;\n  margin-top: 1em;\n}\n\n.gt-button--launch {\n  background: transparent;\n  margin-top: 2em;\n  border: transparent;\n}", ""]);
+	exports.push([module.id, "/* VISUALIZATION */\n.gt-viz {\n  position: fixed;\n  top: 0;\n  left: 0;\n  height: 100%;\n}\n\n\n/* SCREEN */\n.gt-screen {\n  display: flex;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  height: 100vh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n}\n\n/* NAVIGATION */\n.gt-screen__icosahedron {\n  position: fixed;\n  right: 1em;\n  top: 1em;\n  z-index: 9999;\n}\n\n/* NOW PLAYING */\n.gt-screen__nowplaying {\n  position: fixed;\n  left: 2em;\n  bottom: 2em;\n}\n\n.gt-screen__nowplaying-title {\n  margin: 0;\n  padding: 0;\n  font-size: 1.5em;\n  margin-top: -.25em;\n  font-weight: 100;\n  text-transform: lowercase;\n  position: relative;\n  left: -1px;\n}\n\n.gt-gt--nowplaying {\n  position: absolute;\n  left: -1em;\n  top: -1em;\n  font-size: .5em;\n}\n\n/* HERO */\n.gt-screen__title {\n  text-align: center;\n  margin: 0 auto;\n  /*display: flex;*/\n  align-items: flex-start;\n  justify-content: center;\n  background: rgba(255, 240, 245, .95);\n  color: #444;\n  padding: 4em;\n  position: relative;\n  z-index: 1000;\n  border: 1px solid rgba(255, 255, 255, .25);\n  /*box-shadow:  \n    16px 0 32px rgba(30, 45, 200, .45),\n    -16px 0 32px rgba(250, 40, 30, .5);*/\n  border-radius: 50%;\n  position: relative;\n}\n/*\n.gt-screen__title:after,\n.gt-screen__title:before {\n  top: 0;\n  left: 0;\n  content:\"\";\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  border-radius: 50%;\n  z-index: -10;\n}\n\n.gt-screen__title:after {\n  left: -1em;\n  background: rgba(30, 45, 200, .45);\n  \n}\n\n.gt-screen__title:before {\n  left: 1em;\n  background: rgba(250, 40, 30, .5);\n}\n*/\n\n.gt-title,\n.gt-subtitle {\n  margin: 0;\n  line-height: 1;\n  /**/\n}\n\n.gt-title {\n  font-size: 1.75em;\n  text-align: center;\n}\n\n.gt-title .gt-typewriter span {\n  width: 1.25em;\n}\n\n.gt-subtitle {\n  font-weight: 100;\n  font-size: .7em;\n  margin-top: 1em;\n}\n\n.gt-button--launch {\n  background: transparent;\n  margin-top: 2em;\n  border: transparent;\n}\n\n/* TOOLBAR */\n.gt-screen__toolbar {\n  position: fixed;\n  right: 2em;\n  bottom: 2em;\n  text-align: center;\n}\n\n.gt-screen__mute {\n  cursor: pointer;\n}\n\n.gt-screen__mute-label {\n  font-size: .5em;\n}", ""]);
 
 	// exports
 
@@ -63750,7 +63796,7 @@
 
 
 	// module
-	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #212121;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 16px;\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}", ""]);
+	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 16px;\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}", ""]);
 
 	// exports
 

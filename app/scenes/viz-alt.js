@@ -129,7 +129,7 @@ export function init() {
 
 
   // CAMERA
-  camera = new THREE.PerspectiveCamera( 200, screenX / screenY, 1, 20000)
+  camera = new THREE.PerspectiveCamera( 120, screenX / screenY, 1, 20000)
   
   camera.position.z = 1850
   camera.position.y = 10
@@ -205,6 +205,7 @@ export function init() {
         depthWrite: false,
         side: THREE.DoubleSide,
         wireframe: true,
+        wireframeLinewidth: 2,
         //shading: THREE.FlatShading
       });
   
@@ -213,6 +214,7 @@ export function init() {
     transparent: true,
     opacity: .15,
     wireframe: true,
+    wireframeLinewidth: 2,
   });
 
   var geometry = new THREE.SphereGeometry( 1200, 8, 8 )
@@ -261,6 +263,7 @@ export function init() {
   chromaticAbberationPass.params.amount = 100
   oldVideoPass = new WAGNER.OldVideoPass()
   dotScreenPass = new WAGNER.DotScreenPass()
+  halftoneCMYKPass = new WAGNER.HalftoneCMYKPass()
 
   document.addEventListener( 'mousemove', onDocumentMouseMove, false );
   document.addEventListener( 'touchstart', onDocumentTouchStart, false );
@@ -271,6 +274,10 @@ export function init() {
   window.addEventListener( 'resize', onWindowResize, false );
 }
 
+export function setVolumeLevel(level) {
+  console.log('level', level)
+  audio.volume=level/100
+}
 
 export function playScene() {
   // PLAY AUDIO
@@ -292,6 +299,7 @@ function addBeat(beat, num) {
     transparent: true,
     specular: Math.random() * 0xffffff,
     wireframe: true,
+    wireframeLinewidth: 4,
     opacity: 1.0
   })
   const _mesh = new THREE.Mesh(geometry, material)
@@ -338,7 +346,8 @@ function addBar(bar) {
     transparent: true,
     specular: Math.random() * 0xffffff,
     //shading: THREE.FlatShading
-    wireframe: true
+    wireframe: true,
+    wireframeLinewidth: 2,
   })
   const _mesh = new THREE.Mesh(geometry, material)
   _mesh.scale.set(0,0,0)
@@ -369,13 +378,15 @@ function addSegment(segment, radius=10, multiplyScalar=10) {
   const segmentLength = isLoud ? 3 : 1
 
   for(var i = 0; i < segmentLength; i++) {
-    const radius = logScale([0.7, 0.99], [1, 96], loudnessMax)
+    const radius = logScale([0.7, 0.99], [1, 72], loudnessMax)
     const geometry = new THREE.SphereGeometry( radius, 1, 1 )//(radius, 32, 32);
     const material = new THREE.MeshPhongMaterial({
       color: Math.random()*0xffffff, 
+      //color: 0xffffff, 
       transparent: true,
       //specular: Math.random() * 0xffffff,
       wireframe: !isLoud,
+      wireframeLinewidth: 2,
       shading: isLoud ? THREE.FlatShading : THREE.SmoothShading
     })
 
@@ -411,7 +422,7 @@ function tweenSegment(m, loudness, duration, delay=1, remove=true) {
       m.scale.set(this.scale, this.scale, this.scale)
     })
     .onComplete(function() {
-      tweenSegmentOut(m, 2000, loudness*2000, true)
+      tweenSegmentOut(m, 2000, loudness*100, true)
     })
     .start()
     
@@ -564,7 +575,7 @@ export function animate(time) {
     
     if(beatsCount % 4 == 0) {
       console.log('beat', currentBeat.confidence)
-      addBeat(currentBeat, beatsCount)  
+      addBeat(currentBeat, beatsCount)
     }
 
     beatsCount+=1
@@ -596,13 +607,18 @@ export function animate(time) {
   }
     
   TWEEN.update()
+  
+  render()
+  requestAnimationFrame(animate)
+  
   if(playing) {
     analyser.getByteFrequencyData(frequencyData)
     //analyser.getByteTimeDomainData(amplitudeData)
+    
   }
 
-  render()
-  requestAnimationFrame(animate)
+
+  
 }
 
 
@@ -620,14 +636,15 @@ export function render() {
   
   composer.reset();
   composer.render( scene, camera );
-  
-  // composer.pass( dirtPass );
-  composer.pass( chromaticAbberationPass );
 
-  //composer.pass( bloomPass );
-  composer.pass( noisePass );
-  composer.pass( vignettePass );
+  //renderer.render(scene, camera)
+  
+  composer.pass( chromaticAbberationPass );
+  //composer.pass( vignettePass );
   composer.pass( FXAAPass );
+  composer.pass( noisePass );
+  
+  
   
   
   if(spacePressed) {
@@ -642,6 +659,8 @@ export function render() {
     composer.pass( bloomPass );
   }
 
+  
+  composer.pass( bloomPass );
   //composer.pass( oldVideoPass );
   composer.toScreen();
 }
