@@ -59284,6 +59284,7 @@
 	  barrelBlurPass = new WAGNER.PoissonDiscBlurPass();
 
 	  document.getElementById('visualization').addEventListener('mousedown', onDocumentMouseDown, false);
+	  document.getElementById('visualization').addEventListener('mouseup', onDocumentMouseUp, false);
 	  document.getElementById('visualization').addEventListener('mousemove', onDocumentMouseMove, false);
 	  document.getElementById('visualization').addEventListener('touchstart', onDocumentTouchStart, false);
 	  document.getElementById('visualization').addEventListener('touchmove', onDocumentTouchMove, false);
@@ -59392,10 +59393,10 @@
 	  var loudnessMax = getLoudness(segment.loudnessMax);
 
 	  var isLoud = loudnessMax >= 0.95;
-	  var segmentLength = isLoud ? 4 : 1;
+	  var segmentLength = isLoud ? 4 : remixMode ? 4 : 1;
 
 	  for (var i = 0; i < segmentLength; i++) {
-	    var _radius = logScale([0.7, 0.99], [1, 64], loudnessMax);
+	    var _radius = logScale([0.7, 0.99], [1, 32], loudnessMax);
 	    var geometry = new _three2.default.SphereGeometry(_radius, 1, 1); //(radius, 32, 32);
 	    var material = new _three2.default.MeshPhongMaterial({
 	      color: Math.random() * 0xffffff,
@@ -59413,8 +59414,9 @@
 	    _mesh.scale.set(1, 1, 1);
 
 	    if (remixMode) {
-	      _mesh.position.x = mouseX * 2;
-	      _mesh.position.y = -mouseY * 2;
+	      _mesh.position.x = mouseX * 2 + i * 50;
+	      _mesh.position.y = -mouseY * 2 + Math.sin(i) * 100;
+	      _mesh.position.z = mouseY;
 	    } else {
 	      _mesh.position.set(Math.random() * 1.0 - 0.5, 0, -1);
 	      _mesh.position.multiplyScalar(loudnessMax * 1250);
@@ -59735,7 +59737,11 @@
 	}
 
 	function onDocumentMouseDown(evt) {
-	  remixMode = !remixMode;
+	  remixMode = true;
+	}
+
+	function onDocumentMouseUp(evt) {
+	  remixMode = false;
 	}
 
 /***/ },
