@@ -312,11 +312,10 @@ export default class Scene extends Component {
         }}>
         {!this.state.launched && !showNavigation && 
           <div key="footer" className="gt-screen__footer">
-            <p className="gt-footer__credits">
-              <sub>></sub>
-              <br/>
+            <p className="gt-footer__credits gt-sans">
               courtesy of <strong><a href="http://badpandarecords.bandcamp.com" target="_blank">bad panda records</a></strong><br/>
-              design &amp; 3D <strong><a href="http://prestopresto.co" target="_blank">prestopresto</a></strong>
+              design &amp; 3D <strong><a href="http://prestopresto.co" target="_blank">prestopresto</a></strong><br/>
+              stream or download album <strong><a target="_blank" href="http://glasstress.lnk.to/CasacciMana">here</a></strong>
             </p>
           </div>}
       </Transition>

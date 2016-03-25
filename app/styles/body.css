@@ -47,13 +47,13 @@ a:link {
   color: #fff;
 }
 
-p, .serif, .gt-text--serif {
+p, .serif, .gt-serif, .gt-text--serif {
   font-family: Lora, serif;
   line-height: 1.5;
   font-weight: 100;
 }
 
-.sans-serif, .gt-text--sans {
+.gt-sans, .sans-serif, .gt-text--sans {
   font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;
 }
 

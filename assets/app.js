@@ -58834,13 +58834,7 @@
 	            { key: 'footer', className: 'gt-screen__footer' },
 	            _react2.default.createElement(
 	              'p',
-	              { className: 'gt-footer__credits' },
-	              _react2.default.createElement(
-	                'sub',
-	                null,
-	                '>'
-	              ),
-	              _react2.default.createElement('br', null),
+	              { className: 'gt-footer__credits gt-sans' },
 	              'courtesy of ',
 	              _react2.default.createElement(
 	                'strong',
@@ -58860,6 +58854,17 @@
 	                  'a',
 	                  { href: 'http://prestopresto.co', target: '_blank' },
 	                  'prestopresto'
+	                )
+	              ),
+	              _react2.default.createElement('br', null),
+	              'stream or download album ',
+	              _react2.default.createElement(
+	                'strong',
+	                null,
+	                _react2.default.createElement(
+	                  'a',
+	                  { target: '_blank', href: 'http://glasstress.lnk.to/CasacciMana' },
+	                  'here'
 	                )
 	              )
 	            )
@@ -64027,7 +64032,7 @@
 
 
 	// module
-	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 13px;\n}\n\n\n@media screen and (min-width: 480px) {\n  html,\n  body {\n    font-size: 14px;\n  }\n}\n\n@media screen and (min-width: 768px) {\n  html,\n  body {\n    font-size: 15px;\n  }\n}\n\n@media screen and (min-width: 1280px) {\n  html,\n  body {\n    font-size: 16px;\n  }\n}\n\n\n@media screen and (min-width: 1441px) {\n  html,\n  body {\n    font-size: 20px;\n  }\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\n.sans-serif, .gt-text--sans {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-title--light {\n  font-weight: 200;\n}\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}\n\n.gt-text--small {\n  font-size: .85em;\n}\n\n.gt-text--secondary {\n  opacity: .5;\n  line-height: 1;\n}\n\n.gt-text--centered {\n  text-align: center;\n}", ""]);
+	exports.push([module.id, "html,\nbody {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n  color: #fff;\n  /*background-image: url(/assets/imgs/bg@2x.jpg);*/\n  /*background: linear-gradient(#35013F, #EB5033);*/\n  background: #121212;\n  background-size: cover;\n  position: relative;\n  min-height: 100%;\n  font-size: 13px;\n}\n\n\n@media screen and (min-width: 480px) {\n  html,\n  body {\n    font-size: 14px;\n  }\n}\n\n@media screen and (min-width: 768px) {\n  html,\n  body {\n    font-size: 15px;\n  }\n}\n\n@media screen and (min-width: 1280px) {\n  html,\n  body {\n    font-size: 16px;\n  }\n}\n\n\n@media screen and (min-width: 1441px) {\n  html,\n  body {\n    font-size: 20px;\n  }\n}\n\n\na,\na:link {\n  color: #fff;\n}\n\np, .serif, .gt-serif, .gt-text--serif {\n  font-family: Lora, serif;\n  line-height: 1.5;\n  font-weight: 100;\n}\n\n.gt-sans, .sans-serif, .gt-text--sans {\n  font-family: Novecento Sans Wide, Helvetica Neue, sans-serif;\n}\n\nh1,\nh2,\nh3 {\n  text-transform: lowercase;\n}\n\n.gt-title--light {\n  font-weight: 200;\n}\n.gt-text--subhead {\n  font-size: .65em;\n  letter-spacing: .1em;\n  /*border-bottom: 2px solid;*/\n  text-transform: uppercase;\n  font-weight: 900;\n}\n\n.gt-text--small {\n  font-size: .85em;\n}\n\n.gt-text--secondary {\n  opacity: .5;\n  line-height: 1;\n}\n\n.gt-text--centered {\n  text-align: center;\n}", ""]);
 
 	// exports
 
