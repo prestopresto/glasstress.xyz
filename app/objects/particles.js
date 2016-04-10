@@ -58,11 +58,12 @@ export function update(frequencyData, time) {
   for(var i=0; i<frequencyData.length;i++) {
     var particle = geometry.vertices[i];
     particle.y = frequencyData[i]*3
+    particle.z += Math.random() * 5
 //    particle.x -= Math.sin(time)
 
-    // if(particle.x < -2000) {
-    //   particle.x = window.innerWidth*2*Math.random()
-    // }
+    if(particle.z > 2000) {
+      particle.z = -2000
+    }
   }
 
   // while (pCount--) {
