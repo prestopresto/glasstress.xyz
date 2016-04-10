@@ -58355,11 +58355,12 @@
 	  for (var i = 0; i < frequencyData.length; i++) {
 	    var particle = geometry.vertices[i];
 	    particle.y = frequencyData[i] * 3;
+	    particle.z += Math.random() * 5;
 	    //    particle.x -= Math.sin(time)
 
-	    // if(particle.x < -2000) {
-	    //   particle.x = window.innerWidth*2*Math.random()
-	    // }
+	    if (particle.z > 2000) {
+	      particle.z = -2000;
+	    }
 	  }
 
 	  // while (pCount--) {
@@ -59421,7 +59422,7 @@
 	    if (remixMode) {
 	      _mesh.position.x = mouseX * 2 + i * 50;
 	      _mesh.position.y = -mouseY * 2 + Math.sin(i) * 100;
-	      _mesh.position.z = mouseY;
+	      _mesh.position.z = camera.position.z - 3750;
 	    } else {
 	      _mesh.position.set(Math.random() * 1.0 - 0.5, 0, -1);
 	      _mesh.position.multiplyScalar(loudnessMax * 1250);
@@ -59576,7 +59577,7 @@
 	  barDuration = 1 / (_audioData.audioData.info.bpm / 60);
 	  //object3d.rotation.y += 0.01
 	  textObject.position.y -= 4;
-	  particleSystem.rotation.y -= 0.001;
+	  //particleSystem.rotation.y -= 0.001
 	  sphereMesh.rotation.x += 0.01;
 	  sphereMesh.rotation.y += 0.01;
 
@@ -59644,6 +59645,11 @@
 	  //camera.position.y +=(Math.cos(audio.currentTime))*10//( mouseX ) * 0.005;
 	  //camera.rotation.y += (Math.sin(audio.currentTime))/100
 
+	  if (remixMode) {
+	    camera.position.z -= 1;
+	  } else {
+	    camera.position.z = 1850;
+	  }
 	  //camera.lookAt( scene.position );
 
 	  particles.update(frequencyData, audio.currentTime);
